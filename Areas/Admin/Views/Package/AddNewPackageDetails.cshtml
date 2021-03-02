@@ -1,0 +1,523 @@
+﻿
+@{
+    ViewBag.Title = "AddNewPackageDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    @model GymDataAccess.Entities.Custom.PackageDetailCustom
+
+
+
+}
+
+<script src="~/dist/modules/jquery.min.js"></script>
+<link href="~/dist/css/ToggleButton.css" rel="stylesheet" />
+<link href="~/dist/css/chosen.css" rel="stylesheet" />
+<script src="~/dist/js/chosen.jquery.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="fa fa-briefcase"></i>&nbsp;Add New Package Details</div>
+        </h1>
+        <div class="row">
+
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Add New Package Details</h4></div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-md-4">
+
+                                <div class="form-group ">
+                                    <label for="pkgname" style="color:black">Package Name</label>
+                                    @Html.DropDownList("ddlpackagename", new SelectList(Model.lstpackages.ToList(), "PackageId", "PackageName"), "Select Package Name", new { @class = "form-control chosen-select", @onchange = "PackagePrice()", })
+                                </div>
+
+
+                            </div>
+                            <div class="col-md-4">
+
+                                <div class="form-group ">
+                                    <label for="pkgprice" style="color:black">Package Price</label>
+                                    <input id="txtpkgprice" type="text" readonly="readonly" class="form-control" name="pkgprice" placeholder="Package Price" style="background-color:white">
+                                </div>
+
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group ">
+                                    <label for="duration" style="color:black">Time Duration</label>
+                                    <select class="form-control chosen-single" id="ddltimeduration" name="duration">
+                                        <option value="0">Choose Time Duration</option>
+                                        <option value="30">30</option>
+                                        <option value="60">60</option>
+                                        <option value="90">90</option>
+                                        <option value="180">180</option>
+
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row" id="installmentdiv">
+                            <div class="col-md-4">
+                                <div class="form-group ">
+                                    <label for="installment" style="color:black">No. Of Installments</label>
+                                    <input id="txtnoofinstallment" type="text" class="form-control" onkeypress="return restrictAlphabets(event);" name="installment" placeholder="No. Of Installments" onkeyup="NewPrice()" readonly="readonly" style="background-color:white">
+                                </div>
+
+                            </div>
+                            <div class="col-md-4">
+
+                                <div class="form-group ">
+                                    <label for="priceperinstallment" style="color:black">Price Per Installment</label>
+                                    <input id="txtpriceperinstallment" type="text" class="form-control" name="priceperinstallment" placeholder="Price Per Installment" readonly="readonly" style="background-color:white">
+                                </div>
+
+
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group ">
+                                    <label for="ttlpriceafterinstallment" style="color:black">Total Price After Installment</label>
+                                    <input id="txtttlpriceafterinstallment" type="text" class="form-control" onkeypress="return restrictAlphabets(event);" name="ttlpriceafterinstallment" readonly="readonly" style="background-color:white" placeholder="Total Price After Installment">
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+
+                                <div class="form-group ">
+                                 
+                                    <label for="activityname" style="color:black">Activity Name</label>
+                                    @Html.DropDownList("myActivity", new SelectList(Model.LstActivity.ToList(), "Id", "Activity"), "Select Activity", new { multiple = "multiple", @class = "form-control",@onchange = "Activity()" })
+
+                                </div>                             
+                              
+                            </div>
+
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="switch">
+
+                                    @Html.CheckBox("chkoffer", false)
+                                    <span class="slider round"></span>
+                                </label>&nbsp;<b style="font-size:14px" class="text-danger">Check The Check Box To Add Offer On It</b>
+
+                            </div>
+
+                        </div>
+                        <div class="row" id="offerdiv" style="display:none">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="offerprice" style="color:black">Offer Price</label>
+                                    <input type="text" name="offerprice" id="txtofferprice" class="form-control" placeholder="Offer Price" onkeypress="return restrictAlphabets(event);" onkeyup="OfferPrice()">
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group ">
+                                    <label for="ddloffertype" style="color:black">Offer Type</label>
+                                    <select class="form-control chosen-single" name="ddloffertype" id="ddloffertype">
+                                        <option value="0">Choose Offer Type</option>
+                                        <option value="1">Flat</option>
+                                        <option value="2">Discount</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="discountprice" style="color:black">Discount</label>
+                                    <input type="text" id="txtdiscountprice" class="form-control" placeholder="Discount Price" name="discountprice" style="background-color:white" readonly="readonly">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="txtofferstartdate" style="color:black">Offer Start Date</label>
+                                    <input type="text" name="txtofferstartdate" id="txtofferstartdate" class="form-control datepicker1" placeholder="Offer Start Date">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="txtofferenddate" style="color:black">Offer End Date</label>
+                                    <input type="text" name="txtofferenddate" id="txtofferenddate" class="form-control datepicker1" placeholder="Offer End Date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="txtdesc" style="color:black">Package Description</label>
+                                    <textarea type="text" id="txtpackagedescription" name="txtdesc" class="form-control"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+                    </div>
+                    <div class="card-footer text-right">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Reset()">Reset</button>
+                        <button type="button" class="btn btn-primary" id="btnreg" onclick="AddPackageDetails()">Save</button>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+    </div>
+</div>
+<input type="hidden" id="hdfpackageid" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.1/tinymce.min.js"></script>
+
+<script src="~/dist/js/chosen.jquery.js"></script>
+<script type="text/javascript">
+
+    tinymce.init({ forced_root_block: false, selector: 'textarea' });
+
+    $(".chosen-single").chosen({ width: "100%" });
+
+    $(document).ready(function () {  
+        $('#chkoffer').click(function () {
+            if ($(this).is(":checked")) {
+                $("#offerdiv").show();
+                $("#installmentdiv").hide();
+                $("#txtnoofinstallment, #txtpriceperinstallment, #txtttlpriceafterinstallment").val('');
+
+            }
+            else {
+
+                $("#offerdiv").hide();
+                $("#installmentdiv").show();
+                $("#txtofferprice, #txtofferstartdate, #txtdiscountprice, #txtofferenddate").val('');
+                $("#ddloffertype").val(0);
+            }
+        });
+        var date = new Date();
+        var today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        $(".datepicker1").datepicker({
+            format: 'm/d/yyyy',
+            step: 10,
+            startDate: today,
+            autoclose: true
+        });
+        $(".datepicker1").keydown(function (e) {
+            e.preventDefault();
+        });
+    });
+
+  
+
+   
+
+    const PackagePrice = () => {
+
+        let Packageid = $("#ddlpackagename").val();
+        if (Packageid == "0") {
+            toastr.warning("Select the package name");
+            $("#ddlpackagename").css("border", "1px solid red");
+        }
+        else {
+            $("body").addClass("loading");
+
+            $.ajax({
+                cache: false,
+                type: "Get",
+                dataType: "json",
+                url: "/Admin/Package/GetPackageDetailsById",
+                data: { "Packageid": Packageid },
+                success: function (data) {
+                    let data1 = JSON.stringify(data);
+                    let obj = JSON.parse(data1);
+                    if (obj != "undefined") {
+
+
+                        $("#txtpkgprice").val(obj.Packageprice);
+                        $("#txtnoofinstallment").attr("readonly", false);
+                        $("#ddlpackagename").css("border", "1px solid #EDEDED");
+
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+
+
+    }
+
+    const AddPackageDetails = () => {
+      
+        var selected = $("#myActivity option:selected");
+       
+        var arrSelected = [];  
+        selected.each(function () {
+            
+            arrSelected.push($(this).text());
+            
+        });
+        //alert(arrSelected);
+
+
+        let alrtmsg = "";
+        let Id = $("#hdfpackageid").val();
+        let Packagename = $("#ddlpackagename").val();
+        let Noofinstallments = $("#txtnoofinstallment").val() == "" ? 0 : parseFloat($("#txtnoofinstallment").val());
+        let Packageprice = $("#txtpkgprice").val();
+        let Priceperinstallment = $("#txtpriceperinstallment").val() == "" ? 0 : parseFloat($("#txtpriceperinstallment").val());
+        let Totalpriceafterinstallment = $("#txtttlpriceafterinstallment").val() == "" ? 0 : parseFloat($("#txtttlpriceafterinstallment").val());
+        let Duration = $("#ddltimeduration").val();
+        let Isoffer = "";
+        if ($("#chkoffer").prop("checked") == true) {
+            Isoffer = 1;
+        }
+        else {
+            Isoffer = 0;
+        }
+        let OfferPrice = $("#txtofferprice").val() == "" ? 0 : parseFloat($("#txtofferprice").val());
+        let Offertype = $("#ddloffertype").val() == "" ? 0 : parseInt($("#ddloffertype").val());
+        let Discount = $("#txtdiscountprice").val() == "" ? 0 : parseFloat($("#txtdiscountprice").val());;
+        let currentuserid = $("#hdfcurrentuserid").val();
+      
+        let Offerstartdate = $("#txtofferstartdate").val();
+        let Offerenddate = $("#txtofferenddate").val;
+        tinymce.triggerSave();
+        let PackageDescription = $("#txtpackagedescription").val();
+
+        if (Packagename.trim() == "0") {
+            alrtmsg += "Select the package name." + "<br/>";
+            $("#ddlpackagename").css("border", "1px solid red");
+        }
+
+        if (Duration.trim() == "0") {
+            alrtmsg += "Select the time duration." + "<br/>";
+            $("#ddltimeduration").css("border", "1px solid red");
+        }
+
+
+        if ($("#chkoffer").prop("checked") == true) {
+
+            if (OfferPrice == "0") {
+                alrtmsg += "Enter the offer price." + "<br/>";
+                $("#txtofferprice").css("border", "1px solid red");
+            }
+
+            if (Offertype == "0") {
+                alrtmsg += "Select the offer type." + "<br/>";
+                $("#ddloffertype").css("border", "1px solid red");
+            }
+
+            if (Offerstartdate == "") {
+                alrtmsg += "Select the offer start date." + "<br/>";
+                $("#txtofferstartdate").css("border", "1px solid red");
+            }
+
+
+            if (Offerenddate == "") {
+                alrtmsg += "Select the offer end date." + "<br/>";
+                $("#txtofferenddate").css("border", "1px solid red");
+            }
+
+            var fromdate = new Date($("#txtofferstartdate").val());
+            var todate = new Date($("#txtofferenddate").val());
+            if (todate < fromdate) {
+                alrtmsg += "Offer Start Date is greater then Offer End Date." + "<br/>";
+                $("#txtofferenddate").css("border", "1px solid red");
+                $("#txtofferstartdate").css("border", "1px solid red");
+
+            }
+        }
+        else if ($("#chkoffer").prop("checked") == false) {
+            if (Noofinstallments == "0") {
+                alrtmsg += "Enter the no of installment" + "<br/>";
+                $("#txtnoofinstallment").css("border", "1px solid red");
+            }
+        }
+
+        if (PackageDescription.trim() == "") {
+            alrtmsg += "Enter the package description." + "<br/>";
+            $("#txtpackagedescription").css("border", "1px solid red");
+        }
+
+
+
+        if (alrtmsg != "") {
+            toastr.warning(alrtmsg);
+        }
+        else {
+
+            var param = {
+                "PackageDetailId": Id,
+                "PackageId": Packagename,
+                "ActualPrice": Packageprice,
+                "NoOfInstallments": Noofinstallments,
+                "PricePerInstallment": Priceperinstallment,
+                "Discount": Discount,
+                "OfferPrice": OfferPrice,
+                "PlanDescription": PackageDescription,
+                "Crdtby": currentuserid,
+                "TotalPriceAfterInstallment": Totalpriceafterinstallment,
+                "Duration": Duration,
+                "OfferStartDate": Offerstartdate,
+                "OfferEndDate": Offerenddate,
+                "OfferType": Offertype,
+                "IsOffer": Isoffer,
+                "OfferPrice": OfferPrice,
+                "AvalableActivity": arrSelected.toString()
+
+            };
+            $("body").addClass("loading");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Package/AddNewPackagedetails",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+                   
+                    if (result == 1) {
+                        toastr.success('Package Detail Added Successfully.');
+                        Reset();
+                    }
+                    else if (result == 2) {
+                        toastr.warning('Package Detail Already Added.');
+                        Reset();
+                    }
+                    else if (result == 3) {
+                        toastr.success('Package Detail Updated Successfully.');
+                        Reset();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        Reset();
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+    }
+
+    function restrictAlphabets(e) {
+        var x = e.which || e.keycode;
+        if ((x >= 48 && x <= 57))
+            return true;
+        else
+            return false;
+    }
+
+    const NewPrice = () => {
+        let alrtmsg = "";
+        let PackagePrice = parseInt($("#txtpkgprice").val());
+        let Noofinstallments = parseInt($("#txtnoofinstallment").val());
+        let PricePerInstallment = "";
+        let NewPackagePrice = "";
+        if (Noofinstallments < 0) {
+            alrtmsg += "No. of installment can not be negative" + "<br/>";
+            $("#txtnoofinstallment").css("border", "1px solid red");
+        }
+
+        if (Noofinstallments == 0) {
+            alrtmsg += "No. of installment can not be zero" + "<br/>";
+            $("#txtnoofinstallment").css("border", "1px solid red");
+        }
+        if (alrtmsg != "") {
+            toastr.warning(alrtmsg);
+        }
+        if (Noofinstallments == 1) {
+            $("#txtpriceperinstallment").val($("#txtpkgprice").val());
+            $("#txtttlpriceafterinstallment").val($("#txtpkgprice").val());
+        }
+
+        else {
+            NewPackagePrice = parseFloat(PackagePrice) + parseFloat(PackagePrice * 0.2);
+            PricePerInstallment = (NewPackagePrice) / Noofinstallments;
+            var totalprce = 0;
+            for (var i = 0; i < Noofinstallments; i++) {
+                totalprce += PricePerInstallment;
+            }
+            var finalprc = totalprce;
+            if (isNaN(PricePerInstallment)) {
+                PricePerInstallment = 0
+            }
+            $("#txtpriceperinstallment").val(PricePerInstallment);
+            $("#txtttlpriceafterinstallment").val(finalprc);
+        }
+
+    }
+
+    const Reset = () => {
+        $("body").addClass("loading");
+        $("#ddlpackagename").val("");
+        $("#txtnoofinstallment").val('');
+        $("#txtpkgprice").val('');
+        $("#txtpriceperinstallment").val('');
+        $("#txtttlpriceafterinstallment").val('');
+        $("#ddltimeduration").val("");
+        $("#chkoffer").prop("checked", false);
+        $("#txtofferprice").val("");
+        $("#offerdiv").hide();
+        $("#installmentdiv").show();
+        $("#ddloffertype").val("");
+        $("#txtdiscountprice").val("");
+        $("#txtofferstartdate").val("");
+        $("#txtofferenddate").val("");
+        tinymce.triggerSave();
+        $("#txtpackagedescription").val("");
+        $("#ddlpackagename").css("border", "1px solid #EDEDED");
+        $("#txtnoofinstallment").css("border", "1px solid #EDEDED");
+        $("#txtpkgprice").css("border", "1px solid #EDEDED");
+        $("#txtpriceperinstallment").css("border", "1px solid #EDEDED");
+        $("#txtttlpriceafterinstallment").css("border", "1px solid #EDEDED");
+        $("#ddltimeduration").css("border", "1px solid #EDEDED");
+        $("#txtofferprice").css("border", "1px solid #EDEDED");
+        $("#ddloffertype").css("border", "1px solid #EDEDED");
+        $("#txtdiscountprice").css("border", "1px solid #EDEDED");
+        $("#txtofferstartdate").css("border", "1px solid #EDEDED");
+        $("#txtofferenddate").css("border", "1px solid #EDEDED");
+        $("#txtpackagedescription").css("border", "1px solid #EDEDED");
+        $("body").removeClass("loading");
+    }
+
+    var OfferPrice = function () {
+
+        var actualprice = $("#txtpkgprice").val();
+        var offerprc = $("#txtofferprice").val();
+
+        if (parseFloat(offerprc) >= parseFloat(actualprice)) {
+            toastr.warning("Offer Can't Be Applied");
+        }
+        else {
+            var discountprice = parseFloat(actualprice) - parseFloat(offerprc);
+            if (isNaN(discountprice)) {
+                discountprice = 0
+            }
+            $("#txtdiscountprice").val(discountprice);
+        }
+
+
+
+    }
+
+</script>

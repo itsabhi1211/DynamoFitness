@@ -1,0 +1,102 @@
+﻿
+
+
+.flip-box {
+    background-color: transparent;
+    width: 320px;
+    height: 250px;
+    border: 1px solid #f1f1f1;
+    perspective: 1000px;
+}
+
+.flip-box-inner {
+    position: relative;
+    width: 320px;
+    height: 250px;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+}
+
+.flip-box:hover .flip-box-inner {
+    transform: rotateY(180deg);
+}
+
+.flip-box-front, .flip-box-back {
+    position: absolute;
+    width: 320px;
+    height: 250px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.flip-box-front {
+    background-color: #bbb;
+    color: black;
+}
+
+.flip-box-back {
+    background-color: white;
+    color: white;
+    transform: rotateY(180deg);
+}
+
+
+.blink-bg {
+    color: #fff;
+    padding: 10px;
+    display: inline-block;
+    border-radius: 5px;
+    animation: blinkingBackground 2s infinite;
+}
+
+@keyframes blinkingBackground {
+    0% {
+        background-color: #10c018;
+    }
+
+    25% {
+        background-color: #1056c0;
+    }
+
+    50% {
+        background-color: #ef0a1a;
+    }
+
+    75% {
+        background-color: #254878;
+    }
+
+    100% {
+        background-color: #04a1d5;
+    }
+}
+
+.blink-text {
+    color: #000;
+    font-weight: bold;
+    font-size: 2rem;
+    animation: blinkingText 2s infinite;
+}
+
+@keyframes blinkingText {
+    0% {
+        color: #10c018;
+    }
+
+    25% {
+        color: #1056c0;
+    }
+
+    50% {
+        color: #ef0a1a;
+    }
+
+    75% {
+        color: #254878;
+    }
+
+    100% {
+        color: #04a1d5;
+    }
+}

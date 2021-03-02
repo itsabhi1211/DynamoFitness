@@ -1,0 +1,384 @@
+﻿
+@{
+    ViewBag.Title = "Activity";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/dist/modules/jquery.min.js"></script>
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="ion-android-list"></i>&nbsp;Activity</div>
+        </h1>
+        <div class="row">
+
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Add New Activity</h4></div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="form-group col-md-6">
+                                <label for="searchbox" style="color:black">Activity Name</label>
+                                <input id="txtsearch" type="text" class="form-control" name="searchbox" placeholder="Activity Name">
+                            </div>
+                            <div class="form-group col-md-6" style="margin-top:27px">
+
+                                <button type="submit" class="btn btn-primary " id="btnsearch" onclick="Search()">
+                                    Search
+                                </button>
+                                <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#activitymodal">
+                                    Add New Activity
+                                </button>
+                                <button type="button" class="btn btn-primary " onclick="Reset()">
+                                    Reset
+                                </button>
+
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row">
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Trainer List</h4></div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>
+                                        Date
+                                     
+                                    </th>
+                                    <th id="activity">
+                                        Activity
+                                     
+                                    </th>
+                                   
+                                    <th>Action</th>
+                                </tr>
+                                <tbody id="tblcontent">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div id="Paginate" class="pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+
+    <div class="modal fade" id="activitymodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Activity</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="Reset()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <label for="activity_name" style="color:black">Activity Name</label>
+                            <input id="txtactivityname" type="text" class="form-control" name="activity_name" placeholder="Activity Name">
+                        </div>
+                       
+                    </div>
+
+
+
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Reset()">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnsave" onclick="ActivityRegistration()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<input type="hidden" value="@Session["userid"]" id="hdfcurrentuserid" />
+<input type="hidden" id="hdfactivityid" />
+<input type="hidden" value="1" id="hdfPageNumber" />
+<input type="hidden" value="10" id="hdfPageSize" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        GetActivityList();
+    });
+
+    function ActivityRegistration() {
+
+        let alrtmsg = "";
+        let id = $("#hdfactivityid").val();
+        let activityname = $("#txtactivityname").val();        
+        let currentuserid = $("#hdfcurrentuserid").val();
+        
+
+        if (activityname.trim() == "") {
+            alrtmsg += "Enter the activityname" + "\n";
+            $("#txtactivityname").css("border", "1px solid red");
+        }
+              
+
+            if (alrtmsg != "") {
+                toastr.warning(alrtmsg);
+            }
+            else {
+
+                var param = {
+                    "activity": activityname,
+                    "crdtby": currentuserid,
+                    "Id": id
+
+                };
+                $("body").addClass("loading");
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Admin/Activity/NewActivity",
+                    data: { param: JSON.stringify(param) },
+                    success: function (result) {
+
+                        if (result == 1) {
+                            toastr.success('Activity Added Successfully.');
+                            $("body").removeClass("loading");
+                            GetActivityList();                          
+                            Reset();
+                        }
+                        else if (result == 2) {
+                            toastr.warning('Activity is already present.');
+                            GetActivityList();
+                            Reset();
+                        }
+                        else if (result == 3) {
+                            toastr.success('Activity Updated Successfully.');
+                            GetActivityList();
+                            Reset();
+                        }
+
+                        else {
+                            toastr.error('Something Went Wrong.');
+                            GetActivityList();
+                            Reset();
+                        }
+                        $("body").removeClass("loading");
+                    },
+                    error: function (errormessage) {
+                        $("body").removeClass("loading");
+                    }
+                });
+            }
+        
+    }
+
+    function GetActivityList() {
+
+
+        let searchbyname = $("#txtsearch").val();
+        let pagenumber = parseInt($("#hdfPageNumber").val());
+        let pagesize = parseInt($("#hdfPageSize").val());
+        var param = {
+            "SearchByName": searchbyname,
+            "PageNumber": pagenumber,
+            "PageSize": pagesize
+
+        };
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Activity/ActivityList",
+            data: { param: JSON.stringify(param) },
+            success: function (data) {
+               
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (pagenumber == 1) {                   
+                    $("#Paginate").pagination({
+
+                        items: parseInt(obj.CustomPagination),
+                        itemsOnPage: parseInt($('#hdfPageSize').val()),
+                        cssStyle: "light-theme",
+                        onPageClick: function (pagenumber, event) {
+                            $("#hdfPageNumber").val(pagenumber);
+                            window.scrollTo(0, 0);
+                            GetActivityList();
+                        }
+                    });
+                }
+
+                var str = '';
+                let sno = 1;
+                for (var item in obj.LstActivity) {
+
+                    str += "<tr>";
+                    str += "<td>" + sno + "</td>";
+                    str += "<td>" + dateformat(obj.LstActivity[item].Crdt) + "</td>";
+                    str += "<td>" + obj.LstActivity[item].Activity + "</td>";
+                 
+
+                    str += "<td><a href='#' title='Edit' data-toggle='modal' data-target='#activitymodal' onclick='EditActivity(\"" + obj.LstActivity[item].Id + "\")'><span class='fa fa-edit' style='color: blue;'></span></a> | <a href='#' title='Delete' data-toggle='tooltip' onclick='DeleteActivity(\"" + obj.LstActivity[item].Id + "\")'><span class='fa fa-trash' style='color: red;'></span></a></td>";
+                    str += "</tr>";
+                    sno++;
+
+                }
+                if (str != "") {
+                    $("#tblcontent").html(str);
+                }
+                else {
+                    $("#tblcontent").html("no record found");
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+    }
+
+    const Search = () => {
+        $("#hdfPageNumber").val(1);
+        GetActivityList();
+    }
+
+
+    function Reset() {
+
+        $("#activitymodal").modal('hide');
+        $("#txtactivityname").val("");
+        $("#hdfactivityid").val("");
+        $("#txtsearch").val("");
+        $("#btnsave").html("Save"); 
+        GetActivityList();
+
+    }
+
+    const EditActivity = (Id) => {
+
+        $("#hdfactivityid").val(Id);
+        $("#btnsave").html("Update");
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Activity/GetActivityDetailsById",
+           
+            data: { "Id": Id },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);              
+                if (obj != "undefined") {
+                    $("#txtactivityname").val(obj.Activity);
+                 
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+
+    }
+
+    const DeleteActivity = (activityid) => {
+        let result = confirm("Are You Sure, You want to delete the Activity ?");
+
+        if (result == false) {
+            return false;
+        }
+        else {
+            $("body").addClass("loading");
+
+            let param =
+            {
+                "Id": activityid
+            };
+
+            $.ajax({
+                cache: false,
+                type: "Get",
+                dataType: "json",
+                url: "/Admin/Activity/DeleteActivity",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 4) {
+                        toastr.success('Activity Deleted Successfully.');
+                        GetActivityList();
+                        Reset();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        Reset();
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+    }
+
+    const dateformat = (date) => {
+        let newdate = new Date(date),
+            month = '' + (newdate.getMonth() + 1),
+            day = '' + newdate.getDate(),
+            year = newdate.getFullYear();
+
+        if (month.length < 2) {
+            month = '0' + month;
+        }
+
+        if (day.length < 2) {
+            month = '0' + day;
+        }
+
+        return [month, day, year].join('/');
+    }
+
+</script>
+

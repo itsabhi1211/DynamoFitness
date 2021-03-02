@@ -1,0 +1,77 @@
+﻿
+
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.modal1 {
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: black;
+    z-index: 100;
+    opacity: 0.8;
+    filter: alpha(opacity=60);
+    min-height: 100%;
+}
+
+#divImage {
+    display: none;
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: White;
+    height: 550px;
+    width: 600px;
+    padding: 3px;
+}
+
+table {
+    font-family: Open Sans, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+}
+
+
+    table td {
+        border: 1px solid black;
+        padding: 4px;
+        color: black;
+        background: #fcfcfc url('../dist/img/grid/grid-alt.png') repeat-x top;
+    }
+
+
+
+
+
+    table tr:hover {
+        background-color: yellow;
+        font-size: 12px;
+    }
+
+    table th {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        text-align: left;
+        background-color: #172b4d;
+        /*background-color: #574b8f;*/
+        border: 1px solid black;
+        padding: 6px;
+        color: white;
+    }
+
+.clearfix {
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+/*.ddlpagesize {
+    height:50px;
+    width:40px
+}*/

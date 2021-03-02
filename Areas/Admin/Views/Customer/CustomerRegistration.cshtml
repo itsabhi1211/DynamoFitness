@@ -1,0 +1,488 @@
+﻿
+@{
+    ViewBag.Title = "CustomerRegistration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    @model GymDataAccess.Entities.Custom.PackageDetailCustom
+}
+<link href="~/dist/css/ToggleButton.css" rel="stylesheet" />
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="ion-person-stalker"></i>&nbsp;Customer Registration</div>
+        </h1>
+        <div class="row">
+
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Customer Registration</h4></div>
+
+                    <div class="card-body">
+                        <div class="container">
+                            <ul class="nav nav-pills">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#1">Customer Detail</a>
+
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" role="tab" aria-selected="true" href="#2">Physical Details</a>
+
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" role="tab" aria-selected="true" href="#3">Payment Details</a>
+
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content ">
+                                <div class="tab-pane active" id="1">
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+
+                                            <div class="form-group ">
+                                                <label for="pkgname" style="color:black">Package Name</label>
+                                                @Html.DropDownList("ddlpackagename", new SelectList(Model.lstpackages.ToList(), "PackageId", "PackageName"), "Select Package Name", new { @class = "form-control ", @onchange = "OnChangePackagePrice()" })
+
+                                            </div>
+
+
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="packageprice" style="color:black">Package Price</label>
+                                            <input id="txtpackageprice" class="form-control" name="packageprice" placeholder="Package Price" readonly="readonly" style="background-color:white">
+                                        </div>
+                                        <div class="form-group col-4">
+
+                                            <label for="duration" style="color:black">Duration(In Days)</label>
+                                            <input id="txtduraction" class="form-control" name="duration" placeholder="Duration" readonly="readonly" style="background-color:white">
+                                        </div>
+                                    </div>
+                                    <div class="row container">
+                                        <label class="switch ">
+                                            @Html.CheckBox("Text", new { @class = "all_Checkbox" })
+                                            <span class="slider round "></span>
+                                        </label>
+                                        <label class="lbl" style="color: red;  font-size: 14px" id="lbl"><b>&nbsp;See Installment Details</b></label>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-4">
+                                            <label for="noofinstallment" style="color:black">No. of Installment</label>
+                                            <input id="txtnoofinstallment" class="form-control" name="noofinstallment" placeholder="No. of Installment">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="priceperinstallment" style="color:black">Price Per Installment</label>
+                                            <input id="txtpriceinstallment" class="form-control" name="priceperinstallment" placeholder="Price Per Installment">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="totalprice" style="color:black">Price After Installment</label>
+                                            <input id="txttotalprice" class="form-control" name="totalprice" placeholder="Price After Installment">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-4">
+                                            <label for="frist_name" style="color:black">Full Name</label>
+                                            <input id="txtfname" type="text" class="form-control" name="frist_name" placeholder="Full Name">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="contactno" style="color:black">Contact Number</label>
+                                            <input id="txtcontactno" type="text" class="form-control" onkeypress="return restrictAlphabets(event);" name="contactno" placeholder="Contact No.">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="emailid" style="color:black">E-mail Id</label>
+                                            <input id="txtemailid" type="email" class="form-control" name="emailid" placeholder="Email Id">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-4">
+                                            <label for="frist_name" style="color:black">Slot</label>
+                                            <input id="txtfname" type="text" class="form-control" name="frist_name" placeholder="Full Name">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="contactno" style="color:black">Timing</label>
+                                            <input id="txtcontactno" type="text" class="form-control" onkeypress="return restrictAlphabets(event);" name="contactno" placeholder="Contact No.">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="emailid" style="color:black">No of Seats</label>
+                                            <input id="txtemailid" type="email" class="form-control" name="emailid" placeholder="Email Id">
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-4">
+                                            <label for="frist_name" style="color:black">Paid Amount</label>
+                                            <input id="txtfname" type="text" class="form-control" name="frist_name" placeholder="Full Name">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="contactno" style="color:black">Remaning Amount</label>
+                                            <input id="txtcontactno" type="text" class="form-control" onkeypress="return restrictAlphabets(event);" name="contactno" placeholder="Contact No.">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="emailid" style="color:black">Installment No</label>
+                                            <input id="txtemailid" type="email" class="form-control" name="emailid" placeholder="Email Id">
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="tab-pane" id="2">
+                                    <div class="row">
+                                        <div class="form-group col-4">
+                                            <label for="height" style="color:black">Height</label>
+                                            <input id="txtheight" type="text" class="form-control" name="height" placeholder="Height (inches)">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="contactno" style="color:black">Weight</label>
+                                            <input id="txtcontactno" type="text" class="form-control" name="contactno" placeholder="Weight (kg)">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="contactno" style="color:black">Body Mass Index</label>
+                                            <input id="txtcontactno" type="text" class="form-control" name="contactno" placeholder="BMI">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="emailid" style="color:black">Chest</label>
+                                            <input id="txtemailid" type="email" class="form-control" name="emailid" placeholder="Chest (inches)">
+                                        </div>
+                                        <div class="form-group col-4">
+                                            <label for="emailid" style="color:black">Biceps</label>
+                                            <input id="txtemailid" type="email" class="form-control" name="emailid" placeholder="Biceps (inches)">
+                                        </div>
+                                    </div>
+
+
+
+
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row">
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-10">
+                                <h4>Employee List</h4>
+                            </div>
+                            @*<div class="col-2">
+
+                                    <select class="ddlpagesize" id="ddlpagesize" onchange="GetEmployeeList">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+
+                                    </select>
+                                </div>*@
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>
+                                        Registration Date
+                                        @*<div id="sortfname" class="sort">
+                                                <img />
+                                            </div>
+                                            <div id="sortupfname" class="sortup">
+                                                <img />
+                                            </div>
+                                            <div id="sortdownfname" class="sortdown">
+                                                <img />
+                                            </div>*@
+                                    </th>
+                                    <th id="fname">
+                                        Name
+                                        @*<div id="sortfname" class="sort">
+                                                <img />
+                                            </div>
+                                            <div id="sortupfname" class="sortup">
+                                                <img />
+                                            </div>
+                                            <div id="sortdownfname" class="sortdown">
+                                                <img />
+                                            </div>*@
+                                    </th>
+                                    <th id="contactno">
+                                        Contact Numer
+                                        @*<div id="sortcontactno" class="sort">
+                                                <img />
+                                            </div>
+                                            <div id="sortupcontactno" class="sortup">
+                                                <img />
+                                            </div>
+                                            <div id="sortdowncontactno" class="sortdown">
+                                                <img />
+                                            </div>*@
+                                    </th>
+                                    <th id="email">
+                                        Email Id
+
+                                        @*<div id="sortemail" class="sort">
+                                                <img />
+                                            </div>
+                                            <div id="sortupemail" class="sortup">
+                                                <img />
+                                            </div>
+                                            <div id="sortdownemail" class="sortdown">
+                                                <img />
+                                            </div>*@
+                                    </th>
+                                    <th id="status">
+                                        Status
+
+                                        @*<div id="sortemail" class="sort">
+                                                <img />
+                                            </div>
+                                            <div id="sortupemail" class="sortup">
+                                                <img />
+                                            </div>
+                                            <div id="sortdownemail" class="sortdown">
+                                                <img />
+                                            </div>*@
+                                    </th>
+                                    <th>Action</th>
+                                </tr>
+                                <tbody id="tblcontent">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div id="Paginate" class="pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+
+    <div class="modal fade" id="custregmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Customer Registration</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="Reset()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#1">Customer Detail</a>
+
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" role="tab" aria-selected="true" href="#2">Physical Details</a>
+
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" role="tab" aria-selected="true" href="#3">Payment Details</a>
+
+                            </li>
+
+                        </ul>
+
+                        <div class="tab-content ">
+                            <div class="tab-pane active" id="1">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-4">
+
+                                            <div class="form-group ">
+                                                <label for="pkgname" style="color:black">Package Name</label>
+                                                @*@Html.DropDownList("packagename", new { @class = "form-control", @onchange = "OnChangePackagePrice()", })*@
+
+                                            </div>
+
+
+                                        </div>
+                                        <div class="form-group col-2">
+                                            <label for="totalprice" style="color:black">Total Price</label>
+                                            <input id="txttotalprice" class="form-control" name="totalprice" placeholder="Total Price">
+                                        </div>
+                                        <div class="form-group col-2">
+                                            <label for="noofinstallment" style="color:black">No. of Installment</label>
+                                            <input id="txtnoofinstallment" class="form-control" name="noofinstallment" placeholder="No. of Installment">
+                                        </div>
+                                        <div class="form-group col-2">
+                                            <label for="priceperinstallment" style="color:black">Price Per Installment</label>
+                                            <input id="txtpriceinstallment" class="form-control" name="priceperinstallment" placeholder="Price Per Installment">
+                                        </div>
+                                        <div class="form-group col-2">
+                                            <label for="totalprice" style="color:black">Price After Installment</label>
+                                            <input id="txttotalprice" class="form-control" name="totalprice" placeholder="Total Price">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="tab-pane" id="2">
+                                <div class="row" style="margin-top:8px;">
+                                    <div class="col-md-5"><b>Pan No: </b></div>
+                                    <div class="col-md-7"><label id="txtpan"></label></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-5"><b>Aadhar No: </b></div>
+                                    <div class="col-md-7"><label id="txtaadhar"></label></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+
+
+                    <div class="row">
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+
+                            <div class="form-group ">
+                                <label for="pkgname" style="color:black">Package Name</label>
+                                @*@Html.DropDownList("packagename", new { @class = "form-control", @onchange = "OnChangePackagePrice()", })*@
+
+                            </div>
+
+
+                        </div>
+                        <div class="form-group col-2">
+                            <label for="totalprice" style="color:black">Total Price</label>
+                            <input id="txttotalprice" class="form-control" name="totalprice" placeholder="Total Price">
+                        </div>
+                        <div class="form-group col-2">
+                            <label for="noofinstallment" style="color:black">No. of Installment</label>
+                            <input id="txtnoofinstallment" class="form-control" name="noofinstallment" placeholder="No. of Installment">
+                        </div>
+                        <div class="form-group col-2">
+                            <label for="priceperinstallment" style="color:black">Price Per Installment</label>
+                            <input id="txtpriceinstallment" class="form-control" name="priceperinstallment" placeholder="Price Per Installment">
+                        </div>
+                        <div class="form-group col-2">
+                            <label for="totalprice" style="color:black">Price After Installment</label>
+                            <input id="txttotalprice" class="form-control" name="totalprice" placeholder="Total Price">
+                        </div>
+                    </div>
+                    <h6 style="color:black">Physical statics</h6>
+                    <div class="row">
+
+
+                        <div class="form-group col-4">
+                            <label for="height" style="color:black">Height</label>
+                            <input id="txtheight" type="text" class="form-control" name="height" placeholder="Height (inches)">
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="contactno" style="color:black">Weight</label>
+                            <input id="txtcontactno" type="text" class="form-control" name="contactno" placeholder="Weight (kg)">
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="emailid" style="color:black">Chest</label>
+                            <input id="txtemailid" type="email" class="form-control" name="emailid" placeholder="Chest (inches)">
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="emailid" style="color:black">Biceps</label>
+                            <input id="txtemailid" type="email" class="form-control" name="emailid" placeholder="Biceps (inches)">
+                        </div>
+                    </div>
+
+
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Reset()">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnreg" onclick="CustomerRegistration()">Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    const OnChangePackagePrice = () => {
+        debugger;
+        let Packageid = $("#ddlpackagename").val();
+        if (Packageid == "0") {
+            toastr.warning("Select the package name");
+            $("#ddlpackagename").css("border", "1px solid red");
+        }
+        else {
+            $("body").addClass("loading");
+
+            $.ajax({
+                cache: false,
+                type: "Get",
+                dataType: "json",
+                url: "/Admin/Package/GetPackageDetailsByPackageDetailsId",
+                data: { "packageid": Packageid },
+                success: function (data) {
+
+                    let data1 = JSON.stringify(data);
+                    let obj = JSON.parse(data1);
+                    debugger;
+                    if (obj != "undefined") {
+                        $("#txtpackageprice").val(obj.Packageprice);
+                        $("#txtduraction").val(obj.Duration);
+                        //var IsInstallment = txtduraction
+                        //$("#txtpackageprice").attr("readonly", true);
+                        $("#ddlpackagename").css("border", "1px solid #EDEDED");
+
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+
+
+    }
+    function Reset() {
+
+        $("#custregmodal").modal('hide');
+        //$("#txtfname").val("");
+        //$("#hdfuserid").val("");
+        //$("#txtsearch").val("");
+        //$('.chosen-single option').prop('selected', false).trigger('chosen:updated');
+
+        //$("#txtlname").val("");
+        //$("#txtcontactno").val("");
+        //$("#txtemailid").val("");
+        //$("#txtlname").css("border", "1px solid #EDEDED");
+        //$("#txtfname").css("border", "1px solid #EDEDED");
+        //$("#txtcontactno").css("border", "1px solid #EDEDED");
+        //$("#txtemailid").css("border", "1px solid #EDEDED");
+        //$("#btnreg").html("Register");
+        //GetEmployeeList();
+
+    }
+
+</script>

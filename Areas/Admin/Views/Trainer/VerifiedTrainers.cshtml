@@ -1,0 +1,538 @@
+﻿
+@{
+    ViewBag.Title = "VerifiedTrainers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/dist/modules/jquery.min.js"></script>
+<link href="~/dist/css/chosen.css" rel="stylesheet" />
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="ion-person-stalker"></i>&nbsp; Verified Trainers</div>
+        </h1>
+        <div class="row">
+
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4> Verified Trainers</h4></div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="form-group col-md-6">
+                                <label for="searchbox" style="color:black">Name/ E-mail Id/ Contact No.</label>
+                                <input id="txtsearch" type="text" class="form-control" name="searchbox" placeholder="Name/ E-mail Id/ Contact No.">
+                            </div>
+
+                            <div class="form-group col-md-6 text-right" style="margin-top:27px">
+
+                                <button type="submit" class="btn btn-primary " id="btnsearch" onclick="Search()">
+                                    Search
+                                </button>
+
+                                <button type="submit" class="btn btn-primary " onclick="Reset()">
+                                    Reset
+                                </button>
+
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row">
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-10">
+                                <h4> Verified Trainers List</h4>
+                            </div>
+                            @*<div class="col-2">
+
+                                    <select class="ddlpagesize" id="ddlpagesize" onchange="GetTrainerList">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+
+                                    </select>
+                                </div>*@
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>
+                                        Registration Date
+                                        @*<div id="sortfname" class="sort">
+                                                <img />
+                                            </div>
+                                            <div id="sortupfname" class="sortup">
+                                                <img />
+                                            </div>
+                                            <div id="sortdownfname" class="sortdown">
+                                                <img />
+                                            </div>*@
+                                    </th>
+                                    <th id="fname">
+                                        Name
+                                        @*<div id="sortfname" class="sort">
+                                                <img />
+                                            </div>
+                                            <div id="sortupfname" class="sortup">
+                                                <img />
+                                            </div>
+                                            <div id="sortdownfname" class="sortdown">
+                                                <img />
+                                            </div>*@
+                                    </th>
+                                    <th id="contactno">
+                                        Contact Numer
+                                        @*<div id="sortcontactno" class="sort">
+                                                <img />
+                                            </div>
+                                            <div id="sortupcontactno" class="sortup">
+                                                <img />
+                                            </div>
+                                            <div id="sortdowncontactno" class="sortdown">
+                                                <img />
+                                            </div>*@
+                                    </th>
+                                    <th id="email">
+                                        Email Id
+
+                                        @*<div id="sortemail" class="sort">
+                                                <img />
+                                            </div>
+                                            <div id="sortupemail" class="sortup">
+                                                <img />
+                                            </div>
+                                            <div id="sortdownemail" class="sortdown">
+                                                <img />
+                                            </div>*@
+                                    </th>
+
+                                    <th>Action</th>
+                                </tr>
+                                <tbody id="tblcontent">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div id="Paginate" class="pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+
+    <div class="modal fade" id="empregmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Trainer KYC Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="Reset()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <label for="panno" style="color:black">PAN Number</label>
+                            <input id="txtpanno" type="text" class="form-control" name="panno" placeholder="PAN Number" readonly style="background-color:white">
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="aadharno" style="color:black">Aadhar Number</label>
+                            <input id="txtaadharno" type="text" class="form-control" name="aadharno" placeholder="Aadhar Number" readonly style="background-color:white">
+                        </div>
+
+                    </div>
+
+
+
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Reset()">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="userprofilemodel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Trainer Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" onclick="CloseModel()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+
+                    <div class="col-md-5">
+
+                        <div class="sidebar-user-picture">
+                            <img alt="image" id="modelimage" class="img-circle img-rounded center-block" src="" style="display: block;border-radius: 50%;margin-left: auto;    margin-right: auto;width: 50%;border-radius: 50%;">
+
+
+                        </div>
+                        <br />
+                        <div class=" text-xl-center">
+                            <label class="font-weight-bold user-name" id="txtname" style="color:cornflowerblue;font-size: 17px;"></label><label></label>
+                        </div>
+                        <div class="font-weight-bold" style="margin-left:25px">
+                            <i class="fa fa-lg fa-envelope"></i> <a id="txtmail" style="font-size: 15px;padding-left:10px"> </a>
+                        </div>
+
+                        <div class="font-weight-bold" style="margin-left:25px;padding-top:10px">
+                            <i class="fa fa-phone fa-lg fa-rotate-90"></i><a style="font-size: 15px;padding-left: 10px;" id="txtcontact"></a>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6" style="padding-top:15px">
+
+                        <div class="container">
+                            <ul class="nav nav-pills">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#1">Profile Detail</a>
+
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" role="tab" aria-selected="true" href="#2">KYC Detail</a>
+
+                                </li>
+
+                            </ul>
+
+                            <div class="tab-content ">
+                                <div class="tab-pane active" id="1">
+                                    <div class="container">
+                                        <div class="row" style="margin-top:8px;">
+                                            <div class="col-md-5"><span><b>Date Of Joining:</b></span></div>
+                                            <div class="col-md-7 text-left"><label id="txtdoj"></label></div>
+
+                                        </div>
+                                        <div class="row">
+
+                                            <div class="col-md-5"><span><b>Date Of Birth: </b></span></div>
+                                            <div class="col-md-7"><label id="txtdob"></label></div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-5"><span><b>City: </b></span></div>
+                                            <div class="col-md-7 text-left"><label id="txtcity">NA</label></div>
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-5"><b class="showleft">Gender: </b></div>
+                                            <div class="col-md-7"><label id="txtgender">NA</label></div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-5"><b>Address: </b></div>
+                                            <div class="col-md-7"><label id="txtaddress">NA</label></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane" id="2">
+                                    <div class="row" style="margin-top:8px;">
+                                        <div class="col-md-5"><b>Pan No: </b></div>
+                                        <div class="col-md-7"><label id="txtpan"></label></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-5"><b>Aadhar No: </b></div>
+                                        <div class="col-md-7"><label id="txtaadhar"></label></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer" style="margin-top: 12px; margin-bottom: 4px;">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="CloseModel()">Close</button>
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<input type="hidden" value="@Session["userid"]" id="hdfcurrentuserid" />
+<input type="hidden" value="1" id="hdfPageNumber" />
+<input type="hidden" value="10" id="hdfPageSize" />
+
+<script src="~/dist/js/chosen.jquery.js"></script>
+
+
+<script type="text/javascript">
+
+
+
+    $(document).ready(function () {
+        GetTrainerList();
+    });
+    function GetTrainerList() {
+        let searchbyname = $("#txtsearch").val();
+        let pagenumber = parseInt($("#hdfPageNumber").val());
+        let pagesize = parseInt($("#hdfPageSize").val());
+        var param = {
+            "SearchByName": searchbyname,
+            "PageNumber": pagenumber,
+            "PageSize": pagesize,
+
+
+        };
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Trainer/GetVerifiedTrainerList",
+            data: { param: JSON.stringify(param) },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (pagenumber == 1) {
+
+                    $("#Paginate").pagination({
+
+                        items: parseInt(obj.CustomPagination),
+                        itemsOnPage: parseInt($('#hdfPageSize').val()),
+                        cssStyle: "light-theme",
+                        onPageClick: function (pagenumber, event) {
+                            $("#hdfPageNumber").val(pagenumber);
+                            window.scrollTo(0, 0);
+                            GetTrainerList();
+                        }
+                    });
+                }
+
+                var str = '';
+                let sno = 1;
+                for (var item in obj.LstUsers) {
+
+                    str += "<tr>";
+                    str += "<td>" + sno + "</td>";
+                    str += "<td>" + dateformat(obj.LstUsers[item].crdt) + "</td>";
+                    str += "<td><a herf='#' data-toggle='modal' data-target='#userprofilemodel' onclick='ViewEmployeeDetails(\"" + obj.LstUsers[item].userid + "\")' >" + obj.LstUsers[item].name + " </a></td>";
+                    str += "<td>" + obj.LstUsers[item].contactno + "</td>";
+                    str += "<td>" + obj.LstUsers[item].email + "</td>";
+
+                    str += "<td><a href='#' title='View' data-toggle='modal' data-target='#empregmodal' onclick='ViewKYCDetails(\"" + obj.LstUsers[item].userid + "\")'><span class='fa fa-eye' style='color: green;'></span></a></td>";
+
+
+                    str += "</tr>";
+                    sno++;
+
+                }
+                if (str != "") {
+                    $("#tblcontent").html(str);
+                }
+                else {
+                    $("#tblcontent").html("no record found");
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+    }
+    const Search = () => {
+        $("#hdfPageNumber").val(1);
+        GetTrainerList();
+    }
+    function Reset() {
+
+        $("#empregmodal").modal('hide');
+
+        GetTrainerList();
+
+    }
+    const ViewKYCDetails = (userid) => {
+
+        $("#hdfuserid").val(userid);
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Trainer/GetTrainerKYCDetails",
+            data: { "userid": userid },
+            success: function (data) {
+
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (obj != "undefined") {
+                    $("#txtaadharno").val(obj.AadharNo);
+                    $("#txtpanno").val(obj.PanNumber);
+
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+
+    }
+    const dateformat = (date) => {
+        let newdate = new Date(date),
+            month = '' + (newdate.getMonth() + 1),
+            day = '' + newdate.getDate(),
+            year = newdate.getFullYear();
+
+        if (month.length < 2) {
+            month = '0' + month;
+        }
+
+        if (day.length < 2) {
+            month = '0' + day;
+        }
+
+        return [year, month, day].join('-');
+    }
+    function CloseModel() {
+
+        $("#userprofilemodel").modal('hide');
+        $("#modelimage").attr('src', null);
+    }
+    const ViewEmployeeDetails = (UserId) => {
+
+        let userid = UserId;
+        $("body").addClass("loading");
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Employee/Profile/ShowProfileDetails",
+            data: { "userid": userid },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (obj != "undefined") {
+
+                    let profilepicture = obj.profileimg;
+                    if (profilepicture == "" || profilepicture == null) {
+                        $("#modelimage").attr('src', 'https://localhost:44316/Images/default.jpg');
+                    }
+                    else {
+                        $("#modelimage").attr('src', profilepicture);
+                    }
+
+                    let fullname = obj.fname + " " + obj.lname;
+                    $("#txtname").html(fullname);
+                    $("#txtmail").attr("href", "mailto:" + obj.email);
+                    $("#txtmail").html(obj.email);
+                    $("#txtcontact").attr("href", "tel:" + obj.email);
+                    $("#txtcontact").html(obj.contactno);
+                    let city = obj.city;
+                    if (city = " ") {
+                        $("#txtcity").html("NA");
+                    } else {
+                        $("#txtcity").html(obj.city);
+                    }
+                    let gender = obj.gender;
+                    if (gender == "") {
+                        $("#txtgender").text('NA');
+                    }
+                    else if (gender == 'M') {
+                        $("#txtgender").text('Male');
+                    }
+                    else if (gender == 'F') {
+                        $("#txtgender").val('Female');
+                    }
+                    else if (gender == 'O') {
+                        $("#txtgender").val('Other');
+                    }
+
+                    $("#txtdoj").html(dateformat(obj.crdt));
+                    let dob = obj.dob;
+                    if (dob == "" || dob == 0) {
+                        $("#txtdob").html('NA');
+                    }
+                    else {
+                        $("#txtdob").html(dateformat(obj.dob));
+                    }
+                    let address = obj.address;
+                    if (address == "") {
+                        $("#txtaddress").html('NA');
+                    }
+                    else {
+                        $("#txtaddress").html(obj.address);
+                    }
+                    let pan = obj.PanNumber;
+                    if (pan == "") {
+                        $("#txtpan").html('NA');
+                    }
+                    else {
+                        $("#txtpan").html(obj.PanNumber);
+                    }
+                    let aadhar
+                    if (aadhar == "") {
+                        $("#txtaadhar").html('NA');
+                    }
+                    else {
+                        $("#txtaadhar").html(obj.AadharNo);
+                    }
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+
+    }
+
+</script>
+
+
+

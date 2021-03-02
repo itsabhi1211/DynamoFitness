@@ -1,0 +1,273 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <link rel="stylesheet" href="~/dist/modules/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/dist/modules/ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="~/dist/modules/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="~/dist/modules/toastr/build/toastr.min.css">
+    <link rel="stylesheet" href="~/dist/modules/summernote/summernote-lite.css">
+    <link rel="stylesheet" href="~/dist/modules/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="~/dist/css/demo.css">
+    <link href="~/dist/css/chosen.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/dist/css/style.css">
+    <style>
+        #modal {
+            display: none;
+            position: fixed;
+            z-index: 1500;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(255,255,255,0.8) url('../../dist/img/avatar/Ring-Loading-2.gif') no-repeat scroll 50% 50% / 126px;
+        }
+
+        .loading {
+            overflow: hidden;
+        }
+
+            .loading #modal {
+                display: block;
+            }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <section class="section" @*style="background-image: url('../../dist/img/avatar/gymbg.jpg');*@>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
+                        <div class="login-brand">
+                            Dynamo Fitness
+                        </div>
+
+                        <div class="card card-primary">
+                            <div class="card-header"><h4>Login</h4></div>
+
+                            <div class="card-body">
+
+                                @using (Html.BeginForm("UserLogin", "Home", FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken();
+
+
+                                    <div class="form-group">
+                                        <label for="email" style="color:black">Email</label>
+                                        <input id="email" type="email" class="form-control" name="email" tabindex="1" required>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <input type="checkbox" name="faeye" id="faeye" onclick="Toggle()">
+                                        <label for="Password" style="color:black">Password</label>
+                                        <input id="txtpwd" type="password" class="form-control" name="password" tabindex="2" required>
+
+                                    </div>
+
+
+
+                                    <div class="form-group">
+
+                                        <input type="submit" onclick="return Validate();" class="btn btn-primary btn-block" tabindex="4" value="Login" />
+                                    </div>
+                                    <div class="float-right">
+                                        <a data-target="#pwdchangemodal" href="#" data-toggle="modal">
+                                            Forgot Password?
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        @if (TempData.ContainsKey("msg"))
+                        {
+
+                            <div class="alert alert-danger alert-has-icon alert-dismissible show fade">
+                                <div class="alert-icon"><i class="ion ion-ios-lightbulb-outline"></i></div>
+                                <div class="alert-body">
+                                    <button class="close" data-dismiss="alert">
+                                        <span>&times;</span>
+                                    </button>
+                                    <div class="alert-title">@TempData["msg"]</div>
+
+                                </div>
+                            </div>
+                        }
+
+
+                        <div class="simple-footer">
+                            Copyright &copy;@DateTime.Now.AddYears(-2).Year - @DateTime.Now.Year <div class="bullet"></div> Design & Developed By Amit Kasera
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken();
+
+            <div class="modal fade" id="pwdchangemodal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Reset Password</h5>
+                            <button type="button" class="close" data-dismiss="modal" onclick="Close()" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="row">
+                                <div class="form-group col-12 ">
+                                    <label for="usertype2" style="color:black">User Type</label>
+                                    <select class="form-control chosen-single" id="ddlusertype2" name="usertype2">
+                                        <option value="0">Choose User Type</option>
+
+                                        <option value="Employee">Employee</option>
+                                        <option value="Trainer">Trainer</option>
+
+
+                                    </select>
+                                </div>
+                                <div class="form-group col-12">
+                                    <label for="email" style="color:black">Email Id</label>
+                                    <input id="txtemailid" type="text" class="form-control" name="email" placeholder="Email Id">
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Close()">Close</button>
+                            <input type="button" class="btn btn-primary" id="btnchngpwd" onclick="ForgotPassword()" value="Reset Password" />
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div id="modal" class="modal"></div>
+
+    <script src="~/dist/modules/jquery.min.js"></script>
+    <script src="~/dist/modules/popper.js"></script>
+    <script src="~/dist/modules/tooltip.js"></script>
+    <script src="~/dist/modules/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/dist/modules/nicescroll/jquery.nicescroll.min.js"></script>
+    <script src="~/dist/modules/scroll-up-bar/dist/scroll-up-bar.min.js"></script>
+    <script src="~/dist/js/sa-functions.js"></script>
+    <script src="~/dist/modules/toastr/toastr.js"></script>
+    <script src="~/dist/js/scripts.js"></script>
+    <script src="~/dist/js/chosen.jquery.js"></script>
+    <script src="~/dist/js/demo.js"></script>
+    <script type="text/javascript">
+
+
+
+
+        var Toggle = function () {
+            var temp = document.getElementById("txtpwd");
+           
+            if (temp.type === "password") {
+                temp.type = "text";
+
+            }
+            else {
+                temp.type = "password";
+
+
+            }
+        }
+
+
+        //end
+
+        const Close = () => {
+            $("#pwdchangemodal").modal('hide');
+            $("#txtemailid").val("");
+            $("#txtemailid").css("border", "1px solid #EDEDED");
+        }
+
+        const ForgotPassword = () => {
+
+            let alrtmsg = "";
+
+            let emailid = $("#txtemailid").val();
+
+
+            if (emailid.trim() == "") {
+                alrtmsg += "Enter the email Id" + "<br/>";
+                $("#txtemailid").css("border", "1px solid red");
+            }
+
+            if (alrtmsg != "") {
+                toastr.warning(alrtmsg);
+            }
+            else {
+
+
+                $("body").addClass("loading");
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Home/ForgotPassword",
+                    data: { "EmailID": emailid },
+                    success: function (successfull) {
+
+                        if (successfull == 1) {
+                            toastr.success('Password had been changed successfully and it had been sent on your registered email Id.');
+                            Close();
+
+                        }
+                        else if (successfull == 2) {
+                            toastr.warning('Invalid UserId.');
+                            Close();
+
+                        }
+
+
+                        else {
+                            toastr.error('Something Went Wrong.');
+                            Close();
+
+                        }
+                        $("body").removeClass("loading");
+                    },
+                    error: function (errormessage) {
+                        toastr.error('Something Went Wrong.');
+                        Close();
+                        $("body").removeClass("loading");
+                    }
+                });
+            }
+
+        }
+
+        const Validate = () => {
+
+            let valid = true;
+            let usertype = $("#ddlusertype").val();
+            if (usertype == "0") {
+                toastr.warning('Select The User Type.');
+                $("#ddlusertype").css("border", "1px solid red");
+                valid = false;
+            }
+
+            return valid;
+        }
+
+    </script>
+</body>
+</html>

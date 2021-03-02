@@ -1,0 +1,229 @@
+﻿
+@{
+    ViewBag.Title = "KYC";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/dist/modules/jquery.min.js"></script>
+
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="fa fa-list"></i>&nbsp;KYC Details</div>
+        </h1>
+        <div class="row">
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>KYC Details</h4></div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="form-group col-6">
+                                <label for="aadharno" style="color:black">Aadhar Number</label>
+                                <input id="txtaadharno" type="text" class="form-control" name="aadharno">
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="panno" style="color:black">Pan Number</label>
+                                <input id="txtpanno" type="text" class="form-control" name="panno">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group text-right">
+                            <button type="button" class="btn btn-primary " onclick="UpdateKYC()" id="btnupdate">
+                                Update
+                            </button>
+                            <button type="button" class="btn btn-primary " onclick="Reset()" id="btnreset">
+                                Reset
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<input type="hidden" value="@Session["userid"]" id="hdfcurrentuserid" />
+<input type="hidden" value="@Session["verified"]" id="hdfIsVerified"/>
+
+<script type="text/javascript">
+
+
+
+    $(document).ready(function () {
+        KYCDetails();
+        IsVerified();
+    });
+
+    function UpdateKYC() {
+
+
+        let alrtmsg = "";
+        let aadharno = $("#txtaadharno").val();
+        let panno = $("#txtpanno").val().toUpperCase();
+        let currentuserid = $("#hdfcurrentuserid").val();
+        if (aadharno.trim() == "") {
+            alrtmsg += "Enter the Aadhar Number" + "<br/>";
+            $("#txtaadharno").css("border", "1px solid red");
+        }
+
+        if (panno.trim() == "") {
+            alrtmsg += "Enter the PAN Number" + "<br/>";
+            $("#txtpanno").css("border", "1px solid red");
+        }
+
+
+        if (alrtmsg != "") {
+            toastr.warning(alrtmsg);
+        }
+        else {
+
+            if (ValidateAadharNo(aadharno) == true && ValidatePANNo(panno) == true) {
+                var param = {
+                    "AadharNo": aadharno,
+                    "PanNumber": panno,
+                    "userid": currentuserid
+
+
+                };
+                $("body").addClass("loading");
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Employee/Profile/UpdateEmployeeKYC",
+                    data: { param: JSON.stringify(param) },
+                    success: function (result) {
+
+                        if (result == 1) {
+                            toastr.success('KYC Updated Successfully');
+                            KYCDetails();
+                            $("#txtaadharno").css("border", "1px solid #ededed");
+                            $("#txtpanno").css("border", "1px solid #ededed");
+
+                        }
+
+
+                        else {
+                            toastr.error('Something Went Wrong.');
+                            KYCDetails();
+                            $("#txtaadharno").css("border", "1px solid #ededed");
+                            $("#txtpanno").css("border", "1px solid #ededed");
+
+                        }
+                        $("body").removeClass("loading");
+                    },
+                    error: function (errormessage) {
+                        $("body").removeClass("loading");
+                    }
+                });
+            }
+        }
+
+
+    }
+
+    function ValidateAadharNo(aadharno) {
+
+        var regexp = /^[2-9]{1}[0-9]{11}$/;
+
+        let isvalid = true;
+        if (regexp.test(aadharno)) {
+            return isvalid;
+        }
+        else {
+            toastr.warning("Invalid Aadhar no.");
+            isvalid = false;
+            $("#txtaadharno").css("border", "1px solid red");
+        }
+        return isvalid;
+    }
+
+    function ValidatePANNo(panno) {
+
+        var regexp = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
+
+        let isvalid = true;
+        if (regexp.test(panno)) {
+            return isvalid;
+        }
+        else {
+            toastr.warning("Invalid Pan Number .");
+            isvalid = false;
+            $("#txtpanno").css("border","1px solid red");
+        }
+        return isvalid;
+    }
+
+    const KYCDetails = () => {
+      
+        let userid = $("#hdfcurrentuserid").val();
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Employee/Profile/GetEmployeeKYCDetails",
+            data: { "userid":userid },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                
+                if (obj != "undefined") {
+                    
+                    $("#txtaadharno").val(obj.AadharNo);
+                    $("#txtpanno").val(obj.PanNumber);
+
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+
+    }
+
+    function Reset() {
+        $("#txtaadharno").css("border", "1px solid #ededed");
+        $("#txtpanno").css("border", "1px solid #ededed");
+        $("#txtpanno").val("");
+        $("#txtaadharno").val("");
+
+    }
+
+    const IsVerified = () => {
+
+        let isverified = $("#hdfIsVerified").val();
+
+        if (isverified == "True") {
+
+            var btnupdate = document.getElementById("btnupdate");
+            var btnreset = document.getElementById("btnreset");
+
+            btnupdate.style.display = "none";
+            btnreset.style.display = "none";
+
+            $("#txtaadharno").prop('readonly', true);
+            $("#txtpanno").prop('readonly', true);
+
+
+
+        }
+    }
+
+
+
+
+</script>
+
+
+
+
+

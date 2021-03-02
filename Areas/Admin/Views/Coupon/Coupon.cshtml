@@ -1,0 +1,443 @@
+﻿
+@{
+    ViewBag.Title = "Coupon";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/dist/modules/jquery.min.js"></script>
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="ion-android-list"></i>&nbsp;Manage Coupon</div>
+        </h1>
+        <div class="row">
+
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Add New Coupon</h4></div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="form-group col-md-6">
+                                <label for="searchbox" style="color:black">Coupon Name</label>
+                                <input id="txtsearch" type="text" class="form-control" name="searchbox" placeholder="Coupon Name">
+                            </div>
+                            <div class="form-group col-md-6" style="margin-top:27px">
+
+                                <button type="submit" class="btn btn-primary " id="btnsearch" onclick="Search()">
+                                    Search
+                                </button>
+                                <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#couponmodal">
+                                    Add New Coupon
+                                </button>
+                                <button type="button" class="btn btn-primary " onclick="Reset()">
+                                    Reset
+                                </button>
+
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row">
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Coupon List</h4></div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>
+                                         Date                                      
+                                    </th>
+                                    <th id="coupon">
+                                        Coupon                                      
+                                    </th>
+                                    <th id="value">
+                                        Amount
+                                    </th>
+                                    <th>
+                                        Expiry Date
+                                    </th>
+                                   
+                                    <th>Action</th>
+                                </tr>
+                                <tbody id="tblcontent">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div id="Paginate" class="pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+
+    <div class="modal fade" id="couponmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Coupon</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="Reset()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <label for="coupon_name" style="color:black">Coupon Name</label>
+                            <input id="txtcouponname" type="text" class="form-control" name="coupon_name" placeholder="Coupon Name">
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="coupon_value" style="color:black">Coupon Value</label>
+                            <input id="txtcouponvalue" type="text" class="form-control" name="coupon_value" placeholder="Coupon Value" onkeypress="return restrictAlphabets(event);">
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <label for="expiry_date" style="color:black">Expiry Date</label>
+                            <input id="txtexpirydate" type="text" class="form-control" name="expiry_date" placeholder="Expiry Date">
+                        </div>
+                    </div>
+
+
+
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Reset()">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnsave" onclick="CouponRegistration()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<input type="hidden" value="@Session["userid"]" id="hdfcurrentuserid" />
+<input type="hidden" id="hdfCouponId" />
+<input type="hidden" value="1" id="hdfPageNumber" />
+<input type="hidden" value="10" id="hdfPageSize" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var newdate = new Date();
+        newdate.setMonth(newdate.getMonth());
+        newdate.setDate(newdate.getDate());
+        newdate.setFullYear(newdate.getFullYear());
+
+        $("#txtexpirydate").datepicker({
+            format: 'mm/dd/yyyy',
+            startDate: newdate,
+            yearStart: 2021,
+            timepicker: false,
+            scrollInput: false
+        });
+        $("#txtexpirydate").keydown(function (e) {
+            e.preventDefault();
+        });
+        GetCouponList();
+    });
+    function restrictAlphabets(e) {
+        var x = e.which || e.keycode;
+        if ((x >= 48 && x <= 57))
+            return true;
+        else
+            return false;
+    }
+
+    function CouponRegistration() {
+
+        let alrtmsg = "";
+        let id = $("#hdfCouponId").val();
+        let couponname = $("#txtcouponname").val().toUpperCase();
+        let couponvalue = $("#txtcouponvalue").val();
+        let expirydate = $("#txtexpirydate").val(); 
+        let currentuserid = $("#hdfcurrentuserid").val();
+
+
+        if (couponname.trim() == "") {
+            alrtmsg += "Enter the coupon name" + "<br/>";
+            $("#txtcouponname").css("border", "1px solid red");
+        }
+
+        if (couponvalue.trim() == "") {
+            alrtmsg += "Enter the coupon value" + "<br/>";
+            $("#txtcouponvalue").css("border", "1px solid red");
+        }
+
+        if (expirydate.trim() == "") {
+            alrtmsg += "Enter the coupon expiry date" + "<br/>";
+            $("#txtexpirydate").css("border", "1px solid red");
+        }
+
+
+            if (alrtmsg != "") {
+                toastr.warning(alrtmsg);
+            }
+            else {
+
+                var param = {
+                    "CouponName": couponname,
+                    "CouponValue": couponvalue,
+                    "ExpiryDate": expirydate,
+                    "CrdtBy": currentuserid,
+                    "CouponId": id
+
+                };
+                $("body").addClass("loading");
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Admin/Coupon/NewCoupon",
+                    data: { param: JSON.stringify(param) },
+                    success: function (result) {
+
+                        if (result == 1) {
+                            toastr.success('Coupon Added Successfully.');
+                            $("body").removeClass("loading");
+                            GetCouponList();
+                            Reset();
+                        }
+                        else if (result == 2) {
+                            toastr.warning('Coupon is already present.');
+                            GetCouponList();
+                            Reset();
+                        }
+                        else if (result == 3) {
+                            toastr.success('Coupon Updated Successfully.');
+                            GetCouponList();
+                            Reset();
+                        }
+
+                        else {
+                            toastr.error('Something Went Wrong.');
+                            GetCouponList();
+                            Reset();
+                        }
+                        $("body").removeClass("loading");
+                    },
+                    error: function (errormessage) {
+                        $("body").removeClass("loading");
+                    }
+                });
+            }
+
+    }
+
+    function GetCouponList() {
+
+
+        let searchbyname = $("#txtsearch").val();
+        let pagenumber = parseInt($("#hdfPageNumber").val());
+        let pagesize = parseInt($("#hdfPageSize").val());
+        var param = {
+            "SearchByName": searchbyname,
+            "PageNumber": pagenumber,
+            "PageSize": pagesize
+
+        };
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Coupon/CouponList",
+            data: { param: JSON.stringify(param) },
+            success: function (data) {
+               
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (pagenumber == 1) {
+                    $("#Paginate").pagination({
+
+                        items: parseInt(obj.CustomPagination),
+                        itemsOnPage: parseInt($('#hdfPageSize').val()),
+                        cssStyle: "light-theme",
+                        onPageClick: function (pagenumber, event) {
+                            $("#hdfPageNumber").val(pagenumber);
+                            window.scrollTo(0, 0);
+                            GetCouponList();
+                        }
+                    });
+                }
+
+                var str = '';
+                let sno = 1;
+               
+                for (var item in obj.LstCoupon) {
+
+                    str += "<tr>";
+                    str += "<td>" + sno + "</td>";
+                    str += "<td>" + dateformat(obj.LstCoupon[item].Crdt) + "</td>";
+                    str += "<td>" + obj.LstCoupon[item].CouponName + "</td>";
+                    str += "<td>" + obj.LstCoupon[item].CouponValue + "</td>";
+                    str += "<td>" + dateformat(obj.LstCoupon[item].ExpiryDate) + "</td>";
+                    str += "<td><a href='#' title='Edit' data-toggle='modal' data-target='#couponmodal' onclick='EditCoupon(\"" + obj.LstCoupon[item].CouponId + "\")'><span class='fa fa-edit' style='color: blue;'></span></a> | <a href='#' title='Delete' data-toggle='tooltip' onclick='DeleteActivity(\"" + obj.LstCoupon[item].CouponId + "\")'><span class='fa fa-trash' style='color: red;'></span></a></td>";
+                    str += "</tr>";
+                    sno++;
+
+                }
+                if (str != "") {
+                    $("#tblcontent").html(str);
+                }
+                else {
+                    $("#tblcontent").html("no record found");
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+    }
+
+    const Search = () => {
+        $("#hdfPageNumber").val(1);
+        GetCouponList();
+    }
+
+
+    function Reset() {
+
+        $("#couponmodal").modal('hide');
+        $("#txtcouponname").val("");
+        $("#txtcouponvalue").val("");
+        $("#txtexpirydate").val("");
+        $("#hdfCouponId").val("");
+        $("#txtsearch").val("");
+        $("#btnsave").html("Save");
+        $("#txtcouponname").css("border", "1px solid #EDEDED");
+        $("#txtcouponvalue").css("border", "1px solid #EDEDED");
+        $("#txtexpirydate").css("border", "1px solid #EDEDED");
+        GetCouponList();
+
+    }
+
+    const EditCoupon = (Id) => {
+
+        $("#hdfCouponId").val(Id);
+        $("#btnsave").html("Update");
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Coupon/GetCouponDetailsById",
+            data: { "Id": Id },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+               
+                if (obj != "undefined") {
+                    $("#txtcouponname").val(obj.CouponName);
+                    $("#txtcouponvalue").val(obj.CouponValue);
+                    $("#txtexpirydate").val(dateformat(obj.ExpiryDate));
+
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+
+    }
+
+    const DeleteActivity = (CouponId) => {
+        let result = confirm("Are You Sure, You want to delete the Coupon ?");
+
+        if (result == false) {
+            return false;
+        }
+        else {
+            $("body").addClass("loading");
+
+            let param =
+            {
+                "CouponId": CouponId
+            };
+
+            $.ajax({
+                cache: false,
+                type: "Get",
+                dataType: "json",
+                url: "/Admin/Coupon/DeleteCoupon",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 4) {
+                        toastr.success('Coupon Deleted Successfully.');
+                        GetCouponList();
+                        Reset();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        Reset();
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+    }
+
+    const dateformat = (date) => {
+        let newdate = new Date(date),
+            month = '' + (newdate.getMonth() + 1),
+            day = '' + newdate.getDate(),
+            year = newdate.getFullYear();
+
+        if (month.length < 2) {
+            month = '0' + month;
+        }
+
+        if (day.length < 2) {
+            month = '0' + day;
+        }
+
+        return [month, day, year].join('/');
+    }
+
+</script>
+

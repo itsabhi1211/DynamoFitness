@@ -1,0 +1,368 @@
+﻿
+
+@{
+    ViewBag.Title = "RecentChat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    @model GymDataAccess.Entities.Custom.ChatCustom
+}
+
+<script src="~/dist/modules/jquery.min.js"></script>
+<link href="~/dist/css/ToggleButton.css" rel="stylesheet" />
+<link href="~/dist/css/chosen.css" rel="stylesheet" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.1/tinymce.min.js"></script>
+<script src="~/dist/js/chosen.jquery.js"></script>
+
+
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="fa fa-comments"></i>&nbsp;Chat</div>
+        </h1>
+        <div class="row">
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Recent Chat</h4></div>
+
+                    <div class="card-body">
+                        <div class="row">
+
+                            <div class="form-group col-md-6">
+
+                                <input id="txtsearch" type="text" onkeyup="search()" class="form-control" name="searchbox" placeholder="Search Employee Name">
+                            </div>
+                            <div class="form-group col-md-6">
+
+                                <button id="btnnewchat" class="btn btn-primary" data-toggle="modal" data-target="#chatmodal"><i class="fa fa-comment"></i>&nbsp;New Chat</button>
+                            </div>
+
+
+
+
+                        </div>
+                        <div class="row" id="lstemployees">
+
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+
+    <div class="modal fade" id="chatmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content card-primary">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-comments"></i>&nbsp;Chat Box</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="Reset()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group col-12">
+                                <label for="employee" style="color:black">Trainer / Employee</label>
+                                <select class="form-control chosen-single" id="ddlemptype" name="employee" style="height:35px" onchange="showhide()">
+                                    <option value="1">Employee</option>
+                                    <option value="2">Trainer</option>
+
+
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6" style="display:none" id="trainerdiv">
+                            <div class="form-group col-12">
+                                <label style="color:black">Trainer Name</label>
+
+                                @Html.DropDownList("ddltrainer", new SelectList(Model.LstUsers.ToList(), "userid", "name"), "Select Trainer Name", new { @class = "form-control chosen-single", @onchange = "" })
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="empdiv">
+                            <div class="form-group col-12">
+                                <label for="employee" style="color:black">Employee Name</label>
+                                @Html.DropDownList("ddlemployee", new SelectList(Model.lstemp.ToList(), "userid", "name"), "Select Employee Name", new { @class = "form-control chosen-single", @onchange = "" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <div class="form-group col-12">
+                                <label for="msg" style="color:black">Message</label>
+                                <textarea type="text" id="txtmessage" name="msg" class="form-control"></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Reset()">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnreg" onclick="SendMessage()"><i class="fa fa-plane"></i>&nbsp;Send Message</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<input type="hidden" value="@Session["userid"]" id="hdfcurrentuserid" />
+
+<script type="text/javascript">
+    tinymce.init({ forced_root_block: false, selector: 'textarea' });
+
+
+    $(".chosen-single").chosen({ width: "100%" });
+
+
+    $(document).ready(function () {
+        GetEmployeeList();
+    });
+
+    const showhide = () => {
+        let emptype = $("#ddlemptype").val();
+        if (emptype == "2") {
+            $("#trainerdiv").show();
+            $("#empdiv").hide();
+        }
+        else {
+            if (emptype == "1") {
+                $("#trainerdiv").hide();
+                $("#empdiv").show();
+            }
+        }
+
+    }
+
+    const search = () => {
+        const term = $("#txtsearch").val();
+        const emps = document.getElementsByTagName('h6');
+        Array.from(emps).forEach(function (emps) {
+            const title = emps.textContent;
+            if (title.toLowerCase().indexOf(term) != -1) {
+                emps.parentElement.parentElement.style.display = 'flex';
+            } else {
+                emps.parentElement.parentElement.style.display = 'none';
+            }
+        })
+    }
+
+    function Reset() {
+
+        $("#chatmodal").modal('hide');
+    }
+
+    //$.get('../../../Admin/Chat/RecentChatList', null, function (result) {
+    //    var html = '';
+    //    $.each(result, function (key, item) {
+
+    //        html += "<div class='card col-12' style='margin-bottom:5px;border-radius:5px 5px'>";
+    //        html += "<div class='row'>";
+    //        html += "<div class='col-md-6'>";
+    //        html += "<div class='sidebar-user-picture'>";
+    //        let profilepic = "";
+    //        if (item.profilepicture == "") {
+    //            profilepic = "https://localhost:44316/dist/img/avatar/avatar-4.jpeg"
+
+    //        }
+    //        else {
+    //            profilepic = item.profilepicture
+    //        }
+    //        html += "<img src=" + profilepic + " style='height:50px;margin:5px 0px 5px 0px;width:50px;border-radius:50% 50%' />";
+    //        html += "</div >";
+    //        html += "</div >";
+    //        html += "<div class='col-md-6 text-center' style='margin:20px 0px 10px 0px'>";
+    //        html += " <h6>" + item.name + "</h6>";
+    //        html += "</div >";
+    //        html += "</div >";
+    //        html += "</div >";
+    //        html += "</div >";
+
+
+
+    //    });
+
+    //    var a = $(result.length).length
+    //    if (a > 0) {
+    //        $('#lstemployees').html(html);
+
+    //    }
+
+
+    //}, 'json')
+
+    function GetEmployeeList() {
+
+
+
+        let from = parseInt($("#hdfcurrentuserid").val());
+
+        var param = {
+            "sender": from,
+
+
+        };
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Chat/RecentChatList",
+            data: { param: JSON.stringify(param) },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+
+
+                var html = '';
+
+                for (var item in obj.lstchat) {
+
+                    html += "<div class='card col-12' style='margin-bottom:5px;border-radius:5px 5px'>";
+                    html += "<div class='row'>";
+                    html += "<div class='col-md-6'>";
+                    html += "<div class='sidebar-user-picture'>";
+                    let profilepic = "";
+
+                    if (obj.lstchat[item].profilepicture == "") {
+                        profilepic = "https://localhost:44316/dist/img/avatar/avatar-4.jpeg"
+
+                    }
+                    else {
+                        profilepic = obj.lstchat[item].profilepicture;
+                    }
+                    html += "<img src=" + profilepic + " style='height:50px;margin:5px 0px 5px 0px;width:50px;border-radius:50% 50%' />";
+                    html += "</div >";
+                    html += "</div >";
+                    html += "<div class='col-md-6 text-center' style='margin:20px 0px 10px 0px'>";
+                    html += " <h6>" + obj.lstchat[item].sendername + "</h6>";
+                    html += "</div >";
+                    html += "</div >";
+                    html += "</div >";
+                    html += "</div >";
+
+                }
+                if (html != "") {
+                    $("#lstemployees").html(html);
+                }
+                else {
+                    $("#lstemployees").html("no record found");
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+    }
+
+    const dateformat = (date) => {
+        let newdate = new Date(date),
+            month = '' + (newdate.getMonth() + 1),
+            day = '' + newdate.getDate(),
+            year = newdate.getFullYear();
+
+        if (month.length < 2) {
+            month = '0' + month;
+        }
+
+        if (day.length < 2) {
+            month = '0' + day;
+        }
+
+        return [year, month, day].join('-');
+    }
+
+    const SendMessage = () => {
+
+        let alrtmsg = "";
+        let receiver = "";
+        let emptype = $("#ddlemptype").val()
+        if (emptype == "2") {
+            receiver = $("#ddltrainer").val();
+        }
+        else {
+            receiver = $("#ddlemployee").val();
+        }
+
+        let sender = $("#hdfcurrentuserid").val();
+
+        tinymce.triggerSave();
+        let msg = $("#txtmessage").val();
+
+
+        if (receiver.trim() == "") {
+            if (emptype == 1) {
+                alrtmsg += "Select The Employee" + "\n";
+                $("#ddlemployee").css("border", "1px solid red");
+            }
+            else {
+                alrtmsg += "Select The Trainer" + "\n";
+                $("#ddltrainer").css("border", "1px solid red");
+            }
+
+
+        }
+        if (msg.trim() == "") {
+            $("#txtmsg").css("border", "1px solid red");
+        }
+
+
+
+        if (alrtmsg != "") {
+            toastr.warning(alrtmsg);
+        }
+        else {
+
+            var param = {
+                "sender": sender,
+                "receiver": receiver,
+                "message": msg
+
+
+            };
+            $("body").addClass("loading");
+
+            $.ajax({
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Chat/Message",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 1) {
+                        toastr.success('Message Sent Successfully.');
+                        $("#chatmodal").modal('show');
+
+                    }
+
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        $("#chatmodal").modal('show');
+
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+
+    }
+
+</script>

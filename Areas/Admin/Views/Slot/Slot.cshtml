@@ -1,0 +1,546 @@
+﻿
+@{
+    ViewBag.Title = "Slot";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/dist/modules/jquery.min.js"></script>
+<link href="~/dist/css/chosen.css" rel="stylesheet" />
+
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="fa fa-clock"></i>&nbsp;Slot Details</div>
+        </h1>
+        <div class="row">
+
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Slot Details</h4></div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="form-group col-md-6">
+                                <label for="searchbox" style="color:black">StartTime/ EndTime/ No. Of Seats</label>
+                                <input id="txtsearch" type="text" class="form-control" name="searchbox" placeholder="StartTime/ EndTime/ No. Of Seats">
+                            </div>
+                            <div class="form-group col-md-6" style="margin-top:27px">
+
+                                <button type="button" class="btn btn-primary " id="btnsearch" onclick="Search()">
+                                    Search
+                                </button>
+                                <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#Slotregmodal">
+                                    Add New Slot
+                                </button>
+                                <button type="button" class="btn btn-primary " onclick="Reset()">
+                                    Reset
+                                </button>
+
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row">
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-10">
+                                <h4>Slot List</h4>
+                            </div>
+                            @*<div class="col-2">
+
+                                    <select class="ddlpagesize" id="ddlpagesize" onchange="=GetSlotList()">
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+
+                                    </select>
+                                </div>*@
+                        </div>
+
+                    </div>
+
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>
+                                        Date
+
+                                    </th>
+                                    <th>
+                                        Slot Type
+
+                                    </th>
+                                    <th>
+                                        Start Time
+
+                                    </th>
+                                    <th>
+                                        End Time
+
+                                    </th>
+                                    <th>
+                                        No. Of Seats
+
+                                    </th>
+
+
+                                    <th>Action</th>
+                                </tr>
+                                <tbody id="tblcontent">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div id="Paginate" class="pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+<!-- Modal -->
+@using (Html.BeginForm())
+{
+
+    <div class="modal fade" id="Slotregmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Slot</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="Reset()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <label for="ddlslottype" style="color:black">Slot Type</label>
+                            <select class="form-control chosen-single" id="ddlslottype">
+                                <option value="0">Choose Slot Type</option>
+                                <option value="1">Morning</option>
+                                <option value="2">Evening</option>
+
+
+                            </select>
+                        </div>
+
+                        <div class="form-group col-6">
+                            <label for="noofseat" style="color:black">No. Of Seats</label>
+                            <input id="txtnoofseat" type="text" class="form-control" onkeypress="return restrictAlphabets(event);" name="noofseat" placeholder="No. Of Seats">
+                        </div>
+
+                        <div class="form-group col-6">
+                            <label for="ddlstarttime" style="color:black">Start Time</label>
+                            <select class="form-control chosen-single" id="ddlstarttime">
+                                <option value="0">Choose Start Time</option>
+                                <option value="05:00 AM">05:00 AM</option>
+                                <option value="06:00 AM">06:00 AM</option>
+                                <option value="07:00 AM">07:00 AM</option>
+                                <option value="08:00 AM">08:00 AM</option>
+                                <option value="09:00 AM">09:00 AM</option>
+                                <option value="10:00 AM">10:00 AM</option>
+                                <option value="11:00 AM">11:00 AM</option>
+                                <option value="12:00 PM">12:00 PM</option>
+                                <option value="01:00 PM">01:00 PM</option>
+                                <option value="02:00 PM">02:00 PM</option>
+                                <option value="03:00 PM">03:00 PM</option>
+                                <option value="04:00 PM">04:00 PM</option>
+                                <option value="05:00 PM">05:00 PM</option>
+                                <option value="06:00 PM">06:00 PM</option>
+                                <option value="07:00 PM">07:00 PM</option>
+                                <option value="08:00 PM">08:00 PM</option>
+                                <option value="09:00 PM">09:00 PM</option>
+                                <option value="10:00 PM">10:00 PM</option>
+
+
+                            </select>
+                        </div>
+
+                        <div class="form-group col-6">
+                            <label for="ddlendtime" style="color:black">End Time</label>
+                            <select class="form-control chosen-single" id="ddlendtime">
+                                <option value="0">Choose End Time</option>
+                                <option value="05:00 AM">05:00 AM</option>
+                                <option value="06:00 AM">06:00 AM</option>
+                                <option value="07:00 AM">07:00 AM</option>
+                                <option value="08:00 AM">08:00 AM</option>
+                                <option value="09:00 AM">09:00 AM</option>
+                                <option value="10:00 AM">10:00 AM</option>
+                                <option value="11:00 AM">11:00 AM</option>
+                                <option value="12:00 PM">12:00 PM</option>
+                                <option value="01:00 PM">01:00 PM</option>
+                                <option value="02:00 PM">02:00 PM</option>
+                                <option value="03:00 PM">03:00 PM</option>
+                                <option value="04:00 PM">04:00 PM</option>
+                                <option value="05:00 PM">05:00 PM</option>
+                                <option value="06:00 PM">06:00 PM</option>
+                                <option value="07:00 PM">07:00 PM</option>
+                                <option value="08:00 PM">08:00 PM</option>
+                                <option value="09:00 PM">09:00 PM</option>
+                                <option value="10:00 PM">10:00 PM</option>
+
+
+                            </select>
+                        </div>
+                    </div>
+
+
+
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Reset()">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnreg" onclick="AddSlot()">Add New Slot</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<input type="hidden" value="@Session["userid"]" id="hdfcurrentuserid" />
+<input type="hidden" id="hdfSlotid" />
+<input type="hidden" value="1" id="hdfPageNumber" />
+<input type="hidden" value="10" id="hdfPageSize" />
+<script src="~/dist/js/chosen.jquery.js"></script>
+
+<script type="text/javascript">
+
+    $(".chosen-single").chosen({ width: "100%" });
+
+    $(document).ready(function () {
+        GetSlotList();
+    });
+
+    const AddSlot = () => {
+       
+        let alrtmsg = "";
+        let slotid = $("#hdfSlotid").val();
+        let noofseats = $("#txtnoofseat").val();
+        let slottype = $("#ddlslottype").val() == "" ? "0" : $("#ddlslottype").val();
+        let starttime = $("#ddlstarttime").val() == "" ? "0" : $("#ddlstarttime").val();
+        let endtime = $("#ddlendtime").val() == "" ? "0" : $("#ddlendtime").val();
+        let currentuserid = $("#hdfcurrentuserid").val();
+
+        if (noofseats.trim() == "") {
+            alrtmsg += "Enter the noofseats" + "<br/>";
+            $("#txtnoofseat").css("border", "1px solid red");
+        }
+
+        if (slottype.trim() == "0") {
+            alrtmsg += "Select the slot type" + "<br/>";
+            $("#ddlslottype").css("border", "1px solid red");
+        }
+
+        if (starttime.trim() == "0") {
+            alrtmsg += "Select the start time" + "<br/>";
+            $("#ddlstarttime").css("border", "1px solid red");
+        }
+        if (endtime.trim() == "0") {
+            alrtmsg += "Select the end time" + "<br/>";
+            $("#ddlendtime").css("border", "1px solid red");
+        }
+        let starttimeindex = $("#ddlstarttime").val().substr(6, 2);
+        if (starttimeindex == "PM" && slottype == "1") {
+            alrtmsg += "Select morning timing for morning slot" + "<br/>";
+            $("#ddlendtime").css("border", "1px solid red");
+            $("#ddlslottype").css("border", "1px solid red");
+        }
+        if (starttimeindex == "AM" && slottype == "2") {
+            alrtmsg += "Select evening timing for evening slot" + "<br/>";
+            $("#ddlstarttime").css("border", "1px solid red");
+            $("#ddlslottype").css("border", "1px solid red");
+        }
+        let starttimevalue = $("#ddlstarttime").val().substr(0, 2);
+        let endtimevalue = $("#ddlendtime").val().substr(0, 2);
+
+        if (parseInt(endtimevalue) <= parseInt(starttimevalue)) {
+            alrtmsg += "Invalid Timing" + "<br/>";
+            $("#ddlstarttime").css("border", "1px solid red");
+            $("#ddlendtime").css("border", "1px solid red");
+        }
+        if (alrtmsg != "") {
+            toastr.warning(alrtmsg);
+        }
+        else {
+
+            var param = {
+                "slottype": slottype,
+                "starttime": starttime,
+                "endtime": endtime,
+                "noofseats": noofseats,
+                "crdtby": currentuserid,
+                "slotid": slotid
+
+            };
+            $("body").addClass("loading");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Slot/NewSlot",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 1) {
+                        toastr.success('Slot Added Successfully.');
+                        GetSlotList();
+                        Reset();
+                    }
+                    else if (result == 2) {
+                        toastr.warning('Slot Already Added.');
+                        GetSlotList();
+                        Reset();
+                    }
+                    else if (result == 3) {
+                        toastr.success('Slot Updated Successfully.');
+                        GetSlotList();
+                        Reset();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        GetSlotList();
+                        Reset();
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+
+    }
+
+    function GetSlotList() {
+
+
+        let searchbyname = $("#txtsearch").val();
+        let pagenumber = parseInt($("#hdfPageNumber").val());
+        let pagesize = parseInt($("#hdfPageSize").val());
+        // let pagesize = parseInt($("#ddlpagesize").val());
+
+
+
+        var param = {
+            "SearchByName": searchbyname,
+            "PageNumber": pagenumber,
+            "PageSize": pagesize
+
+        };
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Slot/SlotList",
+            data: { param: JSON.stringify(param) },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (pagenumber == 1) {
+                  
+                    $("#Paginate").pagination({
+
+                        items: parseInt(obj.CustomPagination),
+                        itemsOnPage: parseInt($('#hdfPageSize').val()),
+                        cssStyle: "light-theme",
+                        onPageClick: function (pagenumber, event) {
+                            $("#hdfPageNumber").val(pagenumber);
+                            window.scrollTo(0, 0);
+                            GetSlotList();
+                        }
+                    });
+                }
+
+                var str = '';
+                let sno = 1;
+                for (var item in obj.lstSlots) {
+
+                    str += "<tr>";
+                    str += "<td>" + sno + "</td>";
+                    str += "<td>" + dateformat(obj.lstSlots[item].crdt) + "</td>";
+                    str += "<td>" + obj.lstSlots[item].slottypename + "</td>";
+                    str += "<td>" + obj.lstSlots[item].starttime + "</td>";
+                    str += "<td>" + obj.lstSlots[item].endtime + "</td>";
+                    str += "<td>" + obj.lstSlots[item].noofseats + "</td>";
+
+
+                    str += "<td><a href='#' title='Edit' data-toggle='modal' data-target='#Slotregmodal' onclick='EditSlot(\"" + obj.lstSlots[item].slotid + "\")'><span class='fa fa-edit' style='color: blue;'></span></a> | <a href='#' title='Delete' data-toggle='tooltip' onclick='DeleteSlot(\"" + obj.lstSlots[item].slotid + "\")'><span class='fa fa-trash' style='color: red;'></span></a></td>";
+                    str += "</tr>";
+                    sno++;
+
+                }
+                if (str != "") {
+                    $("#tblcontent").html(str);
+                }
+                else {
+                    $("#tblcontent").html("no record found");
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+    }
+
+    const Search = () => {
+        $("#hdfPageNumber").val(1);
+        GetSlotList();
+    }
+
+    function restrictAlphabets(e) {
+        var x = e.which || e.keycode;
+        if ((x >= 48 && x <= 57))
+            return true;
+        else
+            return false;
+    }
+
+    function Reset() {
+
+        $("#Slotregmodal").modal('hide');
+        $("#ddlstarttime").val("0");
+        $("#hdfSlotid").val("");
+        $("#txtsearch").val("");
+        $("#ddlendtime").val("0");
+        $("#ddlslottype").val("0");
+        $("#txtnoofseat").val("");
+        $("#txtnoofseat").css("border", "1px solid #EDEDED");
+        $("#ddlslottype").css("border", "1px solid #EDEDED");
+        $("#ddlendtime").css("border", "1px solid #EDEDED");
+        $("#ddlstarttime").css("border", "1px solid #EDEDED");
+        $("#btnreg").html("Register");
+        GetSlotList();
+
+    }
+
+    const EditSlot = (Slotid) => {
+
+        $("#hdfSlotid").val(Slotid);
+        $("#btnreg").html("Update");
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Slot/GetSlotDetailsById",
+            data: { "Slotid": Slotid },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (obj != "undefined") {
+                    debugger;
+                    $("#txtnoofseat").val(obj.noofseats);
+                    $("#ddlslottype").val(obj.slottype);
+                    $("#ddlstarttime").val(obj.starttime);
+                    $("#ddlendtime").val(obj.endtime);
+
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+
+    }
+
+    const DeleteSlot = (Slotid) => {
+        let result = confirm("Are You Sure, You want to delete the Slot ?");
+
+        if (result == false) {
+            return false;
+        }
+        else {
+            $("body").addClass("loading");
+
+            let param =
+            {
+                "Slotid": Slotid
+            };
+
+            $.ajax({
+                cache: false,
+                type: "Get",
+                dataType: "json",
+                url: "/Admin/Slot/DeleteSlot",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 4) {
+                        toastr.success('Slot Deleted Successfully.');
+                        GetSlotList();
+                        Reset();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        Reset();
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+    }
+
+    const dateformat = (date) => {
+        let newdate = new Date(date),
+            month = '' + (newdate.getMonth() + 1),
+            day = '' + newdate.getDate(),
+            year = newdate.getFullYear();
+
+        if (month.length < 2) {
+            month = '0' + month;
+        }
+
+        if (day.length < 2) {
+            month = '0' + day;
+        }
+
+        return [month, day, year].join('-');
+    }
+
+</script>
+
+

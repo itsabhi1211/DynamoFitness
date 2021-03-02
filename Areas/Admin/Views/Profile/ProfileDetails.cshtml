@@ -1,0 +1,424 @@
+﻿
+@{
+    ViewBag.Title = "ProfileDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/dist/modules/jquery.min.js"></script>
+
+
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="ion-person-stalker"></i>&nbsp;Profile Details</div>
+        </h1>
+        <div class="row">
+
+
+            <div class="col-md-4">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Profile Picture</h4></div>
+
+                    <div class="card-body">
+                        <div class="sidebar-user-picture">
+                            <img id="profileimg" alt="image" class="img-circle img-rounded" src="" style="width:280px;height:300px">
+
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="form-group">
+                            <input type="file" id="profilepicuploader" name="file[]" />
+                            <input type="hidden" id="profilepicpath" />
+                        </div>
+                        <div class="form-group">
+                            <button type="button" id="btnpicuploader" class="btn btn-primary btn-block" onclick="Uploadprofilepicture()">
+                                Update Profile Picture
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Profile</h4></div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="form-group col-6">
+                                <label for="frist_name" style="color:black">First Name</label>
+                                <input id="txtfname" type="text" class="form-control" name="frist_name" readonly>
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="last_name" style="color:black">Last Name</label>
+                                <input id="txtlname" type="text" class="form-control" name="last_name" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input id="txtemailid" type="email" class="form-control" name="email" readonly>
+                            <div class="invalid-feedback">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-6">
+                                <label for="contactno" class="d-block">Contact No.</label>
+                                <input id="txtcontactno" type="text" class="form-control" name="contactno" readonly>
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="state" class="d-block">State</label>
+                                <input id="txtstate" type="text" class="form-control" name="state">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-6">
+                                <label for="city" class="d-block">City</label>
+                                <input id="txtcity" type="text" class="form-control" name="city">
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="pincode" class="d-block">Pincode</label>
+                                <input id="txtpincode" pattern="[0-9]{6}" onkeypress="return restrictAlphabets(event);" title="Pincode is invalid." type="text" class="form-control" name="pincode">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-6">
+                                <label for="dob" class="d-block">Date Of Birth</label>
+                                <input id="txtdob" type="text" class="form-control" name="dob">
+                            </div>
+                            <div class="form-group col-6">
+                                <label>Gender</label>
+                                <select class="form-control" id="ddlgender" style="font-size: 13px; padding: 7px 12px; line-height: 20px;">
+                                    <option value="0">Choose Gender</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                    <option value="O">Other</option>
+
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="Address">Address</label>
+                            <input id="txtaddress" type="text" class="form-control" name="Address">
+                            <div class="invalid-feedback">
+                            </div>
+                        </div>
+                        <div class="form-group text-right">
+                            <button type="submit" class="btn btn-primary " onclick="UpdateEmployeeprofile()">
+                                Update
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<input type="hidden" value="@Session["userid"]" id="hdfcurrentuserid" />
+
+<script type="text/javascript">
+
+
+
+    $(document).ready(function () {
+
+        var newdate = new Date();
+        newdate.setMonth(newdate.getMonth());
+        newdate.setDate(newdate.getDate() - 1);
+        newdate.setFullYear(newdate.getFullYear());
+
+        $("#txtdob").datepicker({
+            format: 'mm/dd/yyyy',
+            maxDate: newdate,
+            yearStart: 1950,
+            timepicker: false,
+            scrollInput: false
+        });
+
+        $("#txtdob").keydown(function (e) {
+            e.preventDefault();
+        });
+
+        ShowEmployeeprofile();
+
+
+        $("#profilepicuploader").fileupload({
+            autoupload: true,
+            url: '/Common/FileUpload',
+            dataType: 'json',
+            done: function (e, data) {
+
+                if (data.result[0].msg == "Successfull") {
+                    $("#profilepicpath").val(data.result[0].name);
+                    $("#profileimg").attr('src', data.result[0].name);
+                }
+                else {
+                    toastr.error("Something Went Wrong");
+                }
+            },
+            fail: function (e, data) {
+                toastr.error("Upload Failed.");
+            }
+
+        }).on('btnpicuploader', function (e, data) {
+            $("body").addClass("loading");
+
+        });
+    });
+
+    const Uploadprofilepicture = () => {
+
+        let profilepic = $("#profilepicpath").val();
+        let userid = $("#hdfcurrentuserid").val();
+        if (profilepic.trim() == "") {
+            toastr.warning("Please Choose The File.");
+        }
+        else {
+
+
+
+            var param = {
+                "userid": userid,
+                "profileimg": profilepic,
+
+
+            };
+            $("body").addClass("loading");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Profile/UpdateProfileImage",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 1) {
+
+                        $("#profilepicpath").val("");
+                        $("#profileimg").attr("src", "");
+                        window.location.assign("/Admin/Profile/ProfileDetails");
+
+
+
+                    }
+
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        ShowEmployeeprofile();
+
+                        $("#profileimg").attr('src', "");
+
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+    }
+
+    const ShowEmployeeprofile = () => {
+
+        let userid = $("#hdfcurrentuserid").val();
+        $("#profileimg").attr('src', "");
+        $("body").addClass("loading");
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Profile/ShowProfileDetails",
+            data: { "userid": userid },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (obj != "undefined") {
+                    $("#txtfname").val(obj.fname);
+                    $("#txtlname").val(obj.lname);
+                    $("#txtemailid").val(obj.email);
+                    $("#txtcontactno").val(obj.contactno);
+                    $("#txtcity").val(obj.city);
+                    $("#txtaddress").val(obj.address);
+                    $("#txtstate").val(obj.state);
+                    $("#txtdob").val(dateformat(obj.dob));
+
+
+                    let gender = obj.gender;
+
+                    if (gender == "") {
+                        $("#ddlgender").val(0);
+                    }
+                    else {
+                        $("#ddlgender").val(gender).trigger("liszt:updated");
+
+                        ;
+                    }
+                    $("#txtpincode").val(obj.pincode);
+
+                    let profilepicture = obj.profileimg;
+                    if (profilepicture == "" || profilepicture == null) {
+                        $("#profileimg").attr('src', 'https://localhost:44316/Images/default.jpg');
+                    }
+                    else {
+                        $("#profileimg").attr('src', profilepicture);
+                    }
+
+
+
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+
+    }
+
+    const UpdateEmployeeprofile = () => {
+
+        let userid = $("#hdfcurrentuserid").val();
+        let city = $("#txtcity").val() == "" ? "" : $("#txtcity").val();
+        let address = $("#txtaddress").val() == "" ? "" : $("#txtaddress").val();
+        let state = $("#txtstate").val() == "" ? "" : $("#txtstate").val();
+        let pincode = $("#txtpincode").val() == "" ? 0 : $("#txtpincode").val();
+        let gender = $("#ddlgender").val() == 0 ? "" : $("#ddlgender").val();
+        let dob = $("#txtdob").val();
+        let pin = pincode;
+
+        if (pincode == 0) {
+            var param = {
+                "userid": userid,
+                "city": city,
+                "address": address,
+                "state": state,
+                "pincode": pin,
+                "gender": gender,
+                "dob": dob
+
+            };
+            $("body").addClass("loading");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Profile/UpdateProfile",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 1) {
+                        toastr.success('Profile Updated Successfully');
+                        ShowEmployeeprofile();
+
+                    }
+
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        ShowEmployeeprofile();
+
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+        else {
+            if (ValidatePinCode(pincode) == true) {
+                var param = {
+                    "userid": userid,
+                    "city": city,
+                    "address": address,
+                    "state": state,
+                    "pincode": pin,
+                    "gender": gender,
+                    "dob": dob
+
+                };
+                $("body").addClass("loading");
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Admin/Profile/UpdateProfile",
+                    data: { param: JSON.stringify(param) },
+                    success: function (result) {
+
+                        if (result == 1) {
+                            toastr.success('Profile Updated Successfully');
+                            ShowEmployeeprofile();
+
+                        }
+
+
+                        else {
+                            toastr.error('Something Went Wrong.');
+                            ShowEmployeeprofile();
+
+                        }
+                        $("body").removeClass("loading");
+                    },
+                    error: function (errormessage) {
+                        $("body").removeClass("loading");
+                    }
+                });
+            }
+
+        }
+
+
+
+    }
+
+    const dateformat = (date) => {
+        let newdate = new Date(date),
+            month = '' + (newdate.getMonth() + 1),
+            day = '' + newdate.getDate(),
+            year = newdate.getFullYear();
+
+        if (month.length < 2) {
+            month = '0' + month;
+        }
+
+        if (day.length < 2) {
+            month = '0' + day;
+        }
+
+        return [year, month, day].join('-');
+    }
+
+    function restrictAlphabets(e) {
+        var x = e.which || e.keycode;
+        if ((x >= 48 && x <= 57))
+            return true;
+        else
+            return false;
+    }
+    function ValidatePinCode(pincode) {
+
+        var regexp = /^[1-9]{1}[0-9]{5}$/;
+
+        let isvalid = true;
+
+        if (regexp.test(pincode)) {
+            return isvalid;
+        }
+        else {
+            toastr.warning("Invalid Pincode No.");
+            isvalid = false;
+            $("#txtpincode").css("border", "1px solid red");
+        }
+        return isvalid;
+    }
+</script>
+
+

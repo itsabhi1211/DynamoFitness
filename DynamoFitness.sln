@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30907.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamoFitness", "DynamoFitness.csproj", "{7BB6D4D1-3487-42FC-ABFE-51BFC700B12B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymDataAccess", "..\GymDataAccess\GymDataAccess.csproj", "{DA3460F2-93F3-4770-ABB5-CFBA0C9AD195}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7BB6D4D1-3487-42FC-ABFE-51BFC700B12B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BB6D4D1-3487-42FC-ABFE-51BFC700B12B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BB6D4D1-3487-42FC-ABFE-51BFC700B12B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BB6D4D1-3487-42FC-ABFE-51BFC700B12B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA3460F2-93F3-4770-ABB5-CFBA0C9AD195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA3460F2-93F3-4770-ABB5-CFBA0C9AD195}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA3460F2-93F3-4770-ABB5-CFBA0C9AD195}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA3460F2-93F3-4770-ABB5-CFBA0C9AD195}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E3A8906F-B724-4F98-9F78-F8512A586AC8}
+	EndGlobalSection
+EndGlobal

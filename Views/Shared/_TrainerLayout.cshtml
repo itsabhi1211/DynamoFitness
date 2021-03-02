@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" name="viewport">
+    <title>Dynamo Fitness</title>
+
+    <link rel="stylesheet" href="~/dist/modules/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/dist/modules/ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="~/dist/modules/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="~/dist/modules/toastr/build/toastr.min.css">
+    <link href="~/Content/Grid.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/dist/css/demo.css">
+    <link rel="stylesheet" href="~/dist/css/style.css">
+    <link href="~/dist/css/simplePagination.css" rel="stylesheet" />
+    <link href="~/dist/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+
+</head>
+
+<body>
+    <div id="app">
+        <div class="main-wrapper">
+            <div class="navbar-bg"></div>
+            <nav class="navbar navbar-expand-lg main-navbar">
+                <div class="form-inline mr-auto">
+                    <ul class="navbar-nav mr-3">
+                        <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i class="ion ion-navicon-round"></i></a></li>
+                        @*<li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i class="ion ion-search"></i></a></li>*@
+                    </ul>
+                    @*<div class="search-element">
+                            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn" type="submit"><i class="ion ion-search"></i></button>
+                        </div>*@
+                </div>
+
+                <ul class="navbar-nav navbar-right">
+                    <li>
+                        <a class="nav-link nav-link-lg"> <div class="d-sm-none d-lg-inline-block text-warning ">Last Login:-@Session["lastlogin"] </div></a>
+
+                    </li>
+                    <li class="dropdown dropdown-list-toggle">
+                        <a href="#" data-toggle="dropdown" class="nav-link notification-toggle nav-link-lg beep"><i class="ion ion-ios-bell-outline"></i></a>
+                        <div class="dropdown-menu dropdown-list dropdown-menu-right">
+                            <div class="dropdown-header">
+                                Notifications
+                                <div class="float-right">
+                                    <a href="/Trainer/Chat/RecentChat">View All</a>
+                                </div>
+                            </div>
+                            <div class="dropdown-list-content">
+                                <a href="/Trainer/Chat/RecentChat" class="dropdown-item dropdown-item-unread">
+                                    <img alt="image" src="~/dist/img/avatar/avatar-1.jpeg" class="rounded-circle dropdown-item-img">
+                                    <div class="dropdown-item-desc">
+                                        <b>Kusnaedi</b> has moved task <b>Fix bug header</b> to <b>Done</b>
+                                        <div class="time">10 Hours Ago</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="dropdown-item dropdown-item-unread">
+                                    <img alt="image" src="~/dist/img/avatar/avatar-2.jpeg" class="rounded-circle dropdown-item-img">
+                                    <div class="dropdown-item-desc">
+                                        <b>Ujang Maman</b> has moved task <b>Fix bug footer</b> to <b>Progress</b>
+                                        <div class="time">12 Hours Ago</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <img alt="image" src="~/dist/img/avatar/avatar-3.jpeg" class="rounded-circle dropdown-item-img">
+                                    <div class="dropdown-item-desc">
+                                        <b>Agung Ardiansyah</b> has moved task <b>Fix bug sidebar</b> to <b>Done</b>
+                                        <div class="time">12 Hours Ago</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <img alt="image" src="~/dist/img/avatar/avatar-4.jpeg" class="rounded-circle dropdown-item-img">
+                                    <div class="dropdown-item-desc">
+                                        <b>Ardian Rahardiansyah</b> has moved task <b>Fix bug navbar</b> to <b>Done</b>
+                                        <div class="time">16 Hours Ago</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="dropdown-item">
+                                    <img alt="image" src="~/dist/img/avatar/avatar-5.jpeg" class="rounded-circle dropdown-item-img">
+                                    <div class="dropdown-item-desc">
+                                        <b>Alfa Zulkarnain</b> has moved task <b>Add logo</b> to <b>Done</b>
+                                        <div class="time">Yesterday</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="dropdown">
+                        <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg">
+                            <i class="ion ion-android-person d-lg-none"></i>
+                            <div class="d-sm-none d-lg-inline-block">Hi, @Session["name"]</div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a href="/Trainer/Profile/ProfileDetails" class="dropdown-item has-icon">
+                                <i class="ion ion-android-person"></i> Profile
+                            </a>
+                            <a href="/Trainer/Profile/ChangePassword" class="dropdown-item has-icon">
+                                <i class="ion ion-locked"></i> Change Password
+                            </a>
+                            <a href="/Home/Logout" class="dropdown-item has-icon">
+                                <i class="ion ion-log-out"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <div class="main-sidebar">
+                <aside id="sidebar-wrapper">
+                    <div class="sidebar-brand">
+                        <a href="/Trainer/Dashboard/Dashboard">Dynamo Fitness</a>
+                    </div>
+                    <div class="sidebar-user">
+                        <div class="sidebar-user-picture">
+                            <a href="/Trainer/Profile/ProfileDetails"><img alt="image" src="" id="profileimg1" style="height:40px;margin-top:8px"></a>
+                        </div>
+                        <div class="sidebar-user-details">
+                            <div class="user-name">
+                                <a href="/Trainer/Profile/ProfileDetails">
+                                    @Session["name"] &nbsp;
+                                    
+                                    @if (Convert.ToString(Session["verified"]) == "True")
+                                    {
+                                        <i class="fa fa-check-circle" style="color:blue"></i>
+                                    }
+                                </a>
+
+
+
+                            </div>
+                            <div class="user-role text-dark">
+                                Trainer
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="sidebar-menu">
+                        <li class="menu-header">Dashboard</li>
+                        <li class="active">
+                            <a href="/Trainer/Dashboard/Dashboard"><i class="ion ion-speedometer"></i><span>Dashboard</span></a>
+                        </li>
+
+
+                        <li>
+                            <a href="#" class="has-dropdown"><i class="fa fa-user"></i><span>Trainer Profile</span></a>
+                            <ul class="menu-dropdown">
+                                <li><a href="/Trainer/Profile/ProfileDetails"><i class="ion ion-ios-circle-outline"></i>Profile Details</a></li>
+
+                            </ul>
+                            <ul class="menu-dropdown">
+                                <li><a href="/Trainer/Profile/KYC"><i class="ion ion-ios-circle-outline"></i> KYC Details</a></li>
+
+                            </ul>
+                            <ul class="menu-dropdown">
+                                <li><a href="/Trainer/Profile/Change Password"><i class="ion ion-ios-circle-outline"></i>Change Password</a></li>
+
+                            </ul>
+
+                        </li>
+
+                    </ul>
+
+                </aside>
+            </div>
+            @RenderBody()
+            <footer class="main-footer">
+                <div class="text-center">
+                    Copyright &copy;@DateTime.Now.AddYears(-2).Year - @DateTime.Now.Year <div class="bullet"></div> Design & Developed By Amit Kasera
+                </div>
+                <div class="footer-right"></div>
+            </footer>
+        </div>
+    </div>
+    <input type="hidden" value="@Session["userid"]" id="hdfcurrentuserid" />
+
+    <script src="~/dist/modules/jquery.min.js"></script>
+    <script src="~/dist/modules/jquery.simplePagination.js"></script>
+    <script src="~/dist/modules/bootstrap-datepicker.min.js"></script>
+    <script src="~/dist/modules/jquery.ui.widget.js"></script>
+    <script src="~/dist/modules/jquery.fileupload.js"></script>
+    <script src="~/dist/modules/popper.js"></script>
+    <script src="~/dist/modules/tooltip.js"></script>
+    <script src="~/dist/modules/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/dist/modules/nicescroll/jquery.nicescroll.min.js"></script>
+    <script src="~/dist/modules/scroll-up-bar/dist/scroll-up-bar.min.js"></script>
+    <script src="~/dist/js/sa-functions.js"></script>
+    <script src="~/dist/modules/toastr/toastr.js"></script>
+    <script src="~/dist/modules/chart.min.js"></script>
+    <script src="~/dist/modules/summernote/summernote-lite.js"></script>
+
+    <script src="~/dist/js/scripts.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            Showprofilepic();
+            $(".datepicker").datepicker({
+
+                format: 'dd-mm-yyyy'
+
+            });
+
+        });
+
+
+       
+        const Showprofilepic = () => {
+
+            let userid = $("#hdfcurrentuserid").val();
+
+            $.ajax({
+                cache: false,
+                type: "Get",
+                dataType: "json",
+                url: "/Trainer/Profile/ShowProfileDetails",
+                data: { "userid": userid },
+                success: function (data) {
+                    let data1 = JSON.stringify(data);
+                    let obj = JSON.parse(data1);
+                    if (obj != "undefined") {
+                        debugger;
+                        let profilepicture = obj.profileimg;
+                        if (profilepicture == "" || profilepicture == null) {
+                            $("#profileimg1").attr('src', 'https://localhost:44316/Images/default.jpg');
+                        }
+                        else {
+                            $("#profileimg1").attr('src', profilepicture);
+                        }
+
+
+
+                    }
+
+                },
+
+            });
+
+        }
+    </script>
+    <div id="modal" class="modal"></div>
+    <style>
+        #modal {
+            display: none;
+            position: fixed;
+            z-index: 1500;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(255,255,255,0.8) url('../../dist/img/avatar/Ring-Loading-2.gif') no-repeat scroll 50% 50% / 126px;
+        }
+
+        .loading {
+            overflow: hidden;
+        }
+
+            .loading #modal {
+                display: block;
+            }
+    </style>
+
+</body>
+</html>

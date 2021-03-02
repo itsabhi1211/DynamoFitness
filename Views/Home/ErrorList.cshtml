@@ -1,0 +1,162 @@
+﻿
+@{
+    ViewBag.Title = "ErrorList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script src="~/dist/modules/jquery.min.js"></script>
+<div class="main-content ">
+    <div class="section">
+
+
+        <div class="row">
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Exception List</h4></div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th style="width:10%">Date</th>                                   
+                                    
+                                    <th id="error">
+                                        Exception Message
+
+                                    </th>
+                                        
+                                    <th id="controller">
+                                        Controller
+                                    </th>
+                                    <th id="action">
+                                       Action
+                                    </th>
+                                    <th id="exception">
+                                       Exception Stack
+                                    </th>
+                                   
+                                </tr>
+                                <tbody id="tblcontent">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div id="Paginate" class="pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+<input type="hidden" id="hdfactivityid" />
+<input type="hidden" value="1" id="hdfPageNumber" />
+<input type="hidden" value="25" id="hdfPageSize" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        GetErrorList();
+    });
+
+
+
+    function GetErrorList() {
+
+        let pagenumber = parseInt($("#hdfPageNumber").val());
+        let pagesize = parseInt($("#hdfPageSize").val());
+        var param = {
+            "PageNumber": pagenumber,
+            "PageSize": pagesize
+
+        };
+        $("body").addClass("loading");
+
+        $.ajax({
+
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Home/ExceptionLogger",
+            data: { param: JSON.stringify(param) },
+            success: function (data) {
+               
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (pagenumber == 1) {
+                    
+                    $("#Paginate").pagination({
+
+                        items: parseInt(obj.CustomPagination),
+                        itemsOnPage: parseInt($('#hdfPageSize').val()),
+                        cssStyle: "light-theme",
+                        onPageClick: function (pagenumber, event) {
+                            $("#hdfPageNumber").val(pagenumber);
+                            window.scrollTo(0, 0);                          
+                            GetErrorList();
+                        }
+                    });
+                }
+
+                var str = '';
+                let sno = 1;
+                for (var item in obj.LstExceptionmodel) {
+
+                    str += "<tr>";
+                    str += "<td>" + sno + "</td>";
+                    str += "<td>" + dateformat(obj.LstExceptionmodel[item].exceptionlogtime) + "</td>";
+                    str += "<td>" + obj.LstExceptionmodel[item].exceptionmsg + "</td>";
+                    str += "<td>" + obj.LstExceptionmodel[item].controllername + "</td>";
+                    str += "<td>" + obj.LstExceptionmodel[item].actionname + "</td>";
+                    str += "<td>" + obj.LstExceptionmodel[item].exceptionstacktrack + "</td>";
+                  
+                    sno++;
+
+                }
+                if (str != "") {
+                    $("#tblcontent").html(str);
+                }
+                else {
+                    $("#tblcontent").html("no record found");
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+    }
+
+    const Search = () => {
+        $("#hdfPageNumber").val(1);
+        GetErrorList()
+    }
+
+
+    const dateformat = (date) => {
+        let newdate = new Date(date),
+            month = '' + (newdate.getMonth() + 1),
+            day = '' + newdate.getDate(),
+            year = newdate.getFullYear();
+
+        if (month.length < 2) {
+            month = '0' + month;
+        }
+
+        if (day.length < 2) {
+            month = '0' + day;
+        }
+
+        return [year, month, day].join('-');
+    }
+
+</script>

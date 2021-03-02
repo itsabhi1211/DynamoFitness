@@ -1,0 +1,539 @@
+﻿
+@{
+    ViewBag.Title = "NewPackage";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/dist/modules/jquery.min.js"></script>
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="fa fa-briefcase"></i>&nbsp;Add New Package</div>
+        </h1>
+        <div class="row">
+
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>New Package</h4></div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="form-group col-md-6">
+                                <label for="searchbox" style="color:black">PackageName/ PackagePrice</label>
+                                <input id="txtsearch" type="text" class="form-control" name="searchbox" placeholder="PackageName/ PackagePrice">
+                            </div>
+                            <div class="form-group col-md-6" style="margin-top:27px">
+
+                                <button type="button" class="btn btn-primary " id="btnsearch" onclick="Search()">
+                                    Search
+                                </button>
+                                <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#Packageregmodal">
+                                    Add New Package
+                                </button>
+                                <button type="button" class="btn btn-primary " onclick="Reset()">
+                                    Reset
+                                </button>
+
+                            </div>
+
+
+
+                        </div>
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row">
+
+
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-10">
+                                <h4>Package List</h4>
+                            </div>
+                          
+                        </div>
+
+                    </div>
+
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>
+                                        Date
+
+                                    </th>
+                                    <th>
+                                        Package Name
+
+                                    </th>
+                                    <th>
+                                        Package Price
+
+                                    </th>
+                                    <th>
+                                        Image
+
+                                    </th>
+
+
+
+                                    <th>Action</th>
+                                </tr>
+                                <tbody id="tblcontent">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div id="Paginate" class="pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+<div id="divBackground" class="modal1">
+</div>
+<div id="divImage">
+    <img id="imgFull" alt="" src="" style="display: none; height: 500px; width: 590px" />
+
+    <div class="text-center">
+        <input id="btnClose" type="button" value="Close" class="btn btn-danger" onclick="HideDiv()" />
+    </div>
+    
+
+
+</div>
+<!-- Modal -->
+@using (Html.BeginForm())
+{
+
+    <div class="modal fade" id="Packageregmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content card-primary">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Package</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="Reset()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <label style="color:black">Package Image</label>
+
+
+                            <div class="sidebar-user-picture">
+
+                                <img id="packageimg" alt="image" src="" style="width:150px;height:150px">
+
+                            </div>
+                            <br />
+                            <div class="form-group">
+                                <input type="file" id="packagepicuploader" name="files[]" />
+                                <input type="hidden" id="packagepicpath" />
+                            </div>
+
+
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="form-group col-12">
+                                    <label for="pkgname" style="color:black">Package Name</label>
+                                    <input id="txtpkgname" type="text" class="form-control" name="pkgname" placeholder="Package Name">
+                                </div>
+                                <div class="form-group col-12">
+                                    <label for="pkgprice" style="color:black">Package Price</label>
+                                    <input id="txtpkgprice" type="text" class="form-control" onkeypress="return restrictAlphabets(event);" name="pkgprice" placeholder="Package Price">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Reset()">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnreg" onclick="AddPackage()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<input type="hidden" value="@Session["userid"]" id="hdfcurrentuserid" />
+<input type="hidden" id="hdfPackageid" />
+<input type="hidden" value="1" id="hdfPageNumber" />
+<input type="hidden" value="10" id="hdfPageSize" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        GetPackageList();
+        $("#packagepicuploader").fileupload({
+            autoupload: true,
+            url: '/Common/FileUpload',
+            dataType: 'json',
+            done: function (e, data) {
+
+                if (data.result[0].msg == "Successfull") {
+                    $("#packagepicpath").val(data.result[0].name);
+                    $("#packageimg").attr('src', data.result[0].name);
+                }
+                else {
+                    toastr.error("Something Went Wrong");
+                }
+            },
+            fail: function (e, data) {
+                toastr.error("Upload Failed.");
+            }
+
+        }).on('btnpicuploader', function (e, data) {
+            $("body").addClass("loading");
+
+        });
+    });
+
+    const AddPackage = () => {
+
+        let alrtmsg = "";
+        let Packageid = $("#hdfPackageid").val();
+        let Packagename = $("#txtpkgname").val();
+        let Packageimg = $("#packagepicpath").val();
+        let Packageprice = $("#txtpkgprice").val();
+        let currentuserid = $("#hdfcurrentuserid").val();
+
+        if (Packagename.trim() == "") {
+            alrtmsg += "Enter the package name" + "<br/>";
+            $("#txtpkgname").css("border", "1px solid red");
+        }
+
+        if (Packageprice.trim() == "0") {
+            alrtmsg += "Package price can not be 0" + "<br/>";
+            $("#txtpkgprice").css("border", "1px solid red");
+        }
+
+        if (Packageprice.trim() == "") {
+            alrtmsg += "Enter the package price" + "<br/>";
+            $("#txtpkgprice").css("border", "1px solid red");
+        }
+
+        if (Packageimg.trim() == "") {
+            alrtmsg += "Select the package image" + "<br/>";
+            $("#packagepicuploader").css("border", "1px solid red");
+        }
+
+        if (alrtmsg != "") {
+            toastr.warning(alrtmsg);
+        }
+        else {
+
+            var param = {
+                "Packagename": Packagename,
+                "Packageprice": Packageprice,
+                "Packageimg": Packageimg,
+                "crdtby": currentuserid,
+                "Packageid": Packageid
+
+            };
+            $("body").addClass("loading");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Package/NewPackage",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 1) {
+                        toastr.success('Package Added Successfully.');
+                        GetPackageList();
+                        Reset();
+                    }
+                    else if (result == 2) {
+                        toastr.warning('Package Already Added.');
+                        GetPackageList();
+                        Reset();
+                    }
+                    else if (result == 3) {
+                        toastr.success('Package Updated Successfully.');
+                        GetPackageList();
+                        Reset();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        GetPackageList();
+                        Reset();
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+
+    }
+
+    function GetPackageList() {
+
+
+        let searchbyname = $("#txtsearch").val();
+        let pagenumber = parseInt($("#hdfPageNumber").val());
+        let pagesize = parseInt($("#hdfPageSize").val());
+
+
+        var param = {
+            "SearchByName": searchbyname,
+            "PageNumber": pagenumber,
+            "PageSize": pagesize
+
+        };
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Package/PackageList",
+            data: { param: JSON.stringify(param) },
+            success: function (data) {
+              
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (pagenumber == 1) {
+                    $("#Paginate").pagination({
+
+                        items: parseInt(obj.CustomPagination),
+                        itemsOnPage: parseInt($('#hdfPageSize').val()),
+                        cssStyle: "light-theme",
+                        onPageClick: function (pagenumber, event) {
+                            $("#hdfPageNumber").val(pagenumber);
+                            window.scrollTo(0, 0);
+                            GetPackageList();
+                        }
+                    });
+                }
+
+                var str = '';
+                let sno = 1;
+               
+                for (var item in obj.lstpackages) {
+
+                    str += "<tr>";
+                    str += "<td>" + sno + "</td>";
+                    str += "<td>" + dateformat(obj.lstpackages[item].crdt) + "</td>";
+                    str += "<td>" + obj.lstpackages[item].Packagename + "</td>";
+                    str += "<td>" + obj.lstpackages[item].Packageprice + "</td>";
+                    str += "<td> <img class='img-circle img-responsive' style='height:20px;width:20px' onclick='return LoadDiv(\"" + obj.lstpackages[item].Packageimg + "\"); ' src=" + obj.lstpackages[item].Packageimg + " /> </td > ";
+                    str += "<td><a href='#' title='Edit' data-toggle='modal' data-target='#Packageregmodal' onclick='EditPackage(\"" + obj.lstpackages[item].Packageid + "\")'><span class='fa fa-edit' style='color: blue;'></span></a> | <a href='#' title='Delete' data-toggle='tooltip' onclick='DeletePackage(\"" + obj.lstpackages[item].Packageid + "\")'><span class='fa fa-trash' style='color: red;'></span></a></td>";
+                    str += "</tr>";
+                    sno++;
+
+                }
+                if (str != "") {
+                    $("#tblcontent").html(str);
+                }
+                else {
+                    $("#tblcontent").html("no record found");
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+    }
+
+    const Search = () => {
+        $("#hdfPageNumber").val(1);
+        GetPackageList();
+    }
+
+    function restrictAlphabets(e) {
+        var x = e.which || e.keycode;
+        if ((x >= 48 && x <= 57))
+            return true;
+        else
+            return false;
+    }
+
+    function Reset() {
+
+        $("#Packageregmodal").modal('hide');
+
+        $("#hdfPackageid").val("");
+        $("#btnreg").html("Save");
+        $("#txtsearch").val("");
+        $("#txtpkgname").val("");
+        $("#packagepicpath").val("");
+        $("#packageimg").attr('src',"");
+        $("#txtpkgprice").val("");
+        $("#txtpkgname").css("border", "1px solid #EDEDED");
+        $("#packagepicuploader").css("border", "1px solid #EDEDED");
+        $("#txtpkgprice").css("border", "1px solid #EDEDED");
+        GetPackageList();
+
+    }
+
+    const EditPackage = (Packageid) => {
+
+        $("#hdfPackageid").val(Packageid);
+        $("#btnreg").html("Update");
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Package/GetPackageDetailsById",
+            data: { "Packageid": Packageid },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (obj != "undefined") {                   
+                    $("#txtpkgname").val(obj.Packagename);
+                    $("#txtpkgprice").val(obj.Packageprice);
+                    $("#packagepicpath").val(obj.Packageimg);
+                    $("#packageimg").attr('src',obj.Packageimg);
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+
+    }
+
+    function LoadDiv(url) {
+        var img = new Image();
+        var bcgDiv = document.getElementById("divBackground");
+        var imgDiv = document.getElementById("divImage");
+        var imgFull = document.getElementById("imgFull");
+
+        img.onload = function () {
+            imgFull.src = img.src;
+            imgFull.style.display = "block";
+
+        };
+        img.src = url;
+        var width = document.body.clientWidth;
+        if (document.body.clientHeight > document.body.scrollHeight) {
+            bcgDiv.style.height = document.body.clientHeight + "px";
+        }
+        else {
+            bcgDiv.style.height = document.body.scrollHeight + "px";
+        }
+        imgDiv.style.left = (width - 650) / 2 + "px";
+        imgDiv.style.top = "20px";
+        bcgDiv.style.width = "100%";
+
+        bcgDiv.style.display = "block";
+        imgDiv.style.display = "block";
+        return false;
+    }
+
+    function HideDiv() {
+        var bcgDiv = document.getElementById("divBackground");
+        var imgDiv = document.getElementById("divImage");
+        var imgFull = document.getElementById("imgFull");
+        if (bcgDiv != null) {
+            bcgDiv.style.display = "none";
+            imgDiv.style.display = "none";
+            imgFull.style.display = "none";
+        }
+    }
+
+    const DeletePackage = (Packageid) => {
+        let result = confirm("Are You Sure, You want to delete the Package ?");
+
+        if (result == false) {
+            return false;
+        }
+        else {
+            $("body").addClass("loading");
+
+            let param =
+            {
+                "Packageid": Packageid
+            };
+
+            $.ajax({
+                cache: false,
+                type: "Get",
+                dataType: "json",
+                url: "/Admin/Package/DeletePackage",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 4) {
+                        toastr.success('Package Deleted Successfully.');
+                        GetPackageList();
+                        Reset();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        Reset();
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+    }
+
+    const dateformat = (date) => {
+        let newdate = new Date(date),
+            month = '' + (newdate.getMonth() + 1),
+            day = '' + newdate.getDate(),
+            year = newdate.getFullYear();
+
+        if (month.length < 2) {
+            month = '0' + month;
+        }
+
+        if (day.length < 2) {
+            month = '0' + day;
+        }
+
+        return [month, day, year].join('/');
+    }
+
+    function restrictAlphabets(e) {
+        var x = e.which || e.keycode;
+        if ((x >= 48 && x <= 57))
+            return true;
+        else
+            return false;
+    }
+
+</script>
+
+

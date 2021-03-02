@@ -1,0 +1,674 @@
+﻿
+@{
+    ViewBag.Title = "Notice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/dist/css/ToggleButton.css" rel="stylesheet" />
+<script src="~/dist/modules/jquery.min.js"></script>
+<div class="main-content ">
+    <div class="section">
+        <h1 class="section-header">
+            <div><i class="ion-android-list"></i>&nbsp;Notice</div>
+        </h1>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Add New Notice</h4></div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="form-group col-md-6">
+                                <label for="searchbox" style="color:black">Notice</label>
+                                <input id="txtsearch" type="text" class="form-control" name="searchbox" placeholder="Notice ">
+                            </div>
+                            <div class="form-group col-md-6" style="margin-top:27px">
+
+                                <button type="submit" class="btn btn-primary " id="btnsearch" onclick="Search()">
+                                    Search
+                                </button>
+                                <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#NoticeModal">
+                                    Add New Notice
+                                </button>
+                                <button type="button" class="btn btn-primary " onclick="Reset()">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header"><h4>Notice List</h4></div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table>
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Date</th>
+                                    <th id="notice">Notice</th>
+                                    <th>Employee</th>
+                                    <th>Trainer</th>
+                                    <th>Customer</th>
+                                    <th>Action</th>
+                                </tr>
+                                <tbody id="tblcontent">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <div id="Paginate" class="pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+
+    <div class="modal fade" id="NoticeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Notice</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="Reset()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+
+                            <label for="txtdesc" style="color:black">Notice</label>
+                            <textarea type="text" id="txtnoticename" name="txtdesc" class="form-control"></textarea>
+
+                        </div>
+
+                    </div>
+                    <div class="row ">
+
+                        <div class="form-group col-md-12">
+                            <label for="notice_name" style="color:black">Notice Visibility</label><br />
+                            <label class="lbl" style="color: black;  font-size: 14px" id="">&nbsp;Employee</label>
+                            <label class="switch ">
+
+                                @Html.CheckBox("Employee", new { @id = "chkempreg", @class = "chkform" })
+                                <span class="slider round "></span>
+                            </label>
+
+                            <label class="lbl" style="color: black;  font-size: 14px" id="">&nbsp;Customer</label>
+                            <label class="switch ">
+                                @Html.CheckBox("Customer", new { @id = "chkcustreg", @class = "chkform" })
+                                <span class="slider round "></span>
+                            </label>
+
+                            <label class="lbl" style="color: black;  font-size: 14px" id="">&nbsp;Trainer</label>
+                            <label class="switch ">
+                                @Html.CheckBox("Trainer", new { @id = "chktrainerreg", @class = "chkform" })
+                                <span class="slider round "></span>
+                            </label>
+
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Reset()">Close</button>
+                    <button type="button" class="btn btn-primary" id="btnsave" onclick="Registration()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="ShowNoticeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Notice</h5>
+                <button type="button" class="close" data-dismiss="modal" onclick="Reset()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group col-md-12">                        
+                        <p id="txtshownoticename" style="font-size:16px"></p> 
+                    </div>
+
+                </div>
+              
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="Reset()">Close</button>
+              
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<input type="hidden" value="@Session["userid"]" id="hdfcurrentuserid" />
+<input type="hidden" id="hdfNoticeId" />
+<input type="hidden" value="1" id="hdfPageNumber" />
+<input type="hidden" value="10" id="hdfPageSize" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.1/tinymce.min.js"></script>
+
+<script type="text/javascript">
+    tinymce.init({ forced_root_block: false, selector: 'textarea' });
+    $(document).ready(function () {
+
+        GetNoticeList();
+    });
+
+    function Registration() {
+
+        let alrtmsg = "";
+        let id = $("#hdfNoticeId").val();
+        tinymce.triggerSave();
+        let noticename = $("#txtnoticename").val();
+        let currentuserid = $("#hdfcurrentuserid").val();
+        let employee;
+        let customer;
+        let trainer;
+
+        debugger;
+        if ($('#chkempreg').is(':checked')) {
+            employee = 1;;
+        }
+        else {
+            employee = 0;
+        }
+
+        if ($('#chkcustreg').is(':checked')) {
+            customer = 1;
+        }
+        else {
+            customer = 0;
+        }
+
+        if ($('#chktrainerreg').is(':checked')) {
+            trainer = 1;
+        }
+        else {
+            trainer = 0;
+        }
+        var arrSelected1 = [];
+        var i = 0;
+        $('.chkform:checked').each(function () {
+
+            arrSelected1[i++] = $(this).attr('id');
+
+        });
+        if (arrSelected1.length == 0) {
+            alrtmsg += "Select any notice visibility." + "<br/>";
+        }
+
+        if (noticename.trim() == "") {
+            alrtmsg += "Enter the notice" + "<br/>";
+            $("#txtnoticename").css("border", "1px solid red");
+        }
+
+
+        if (alrtmsg != "") {
+            toastr.warning(alrtmsg);
+        }
+        else {
+
+            var param = {
+                "Notice": noticename,
+                "Employee": employee,
+                "Customer": customer,
+                "Trainer": trainer,
+                "CrdtBy": currentuserid,
+                "NoticeId": id
+
+            };
+            $("body").addClass("loading");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Notice/NewNotice",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 1) {
+                        toastr.success('Notice Added Successfully.');
+                        $("body").removeClass("loading");
+                        GetNoticeList();
+                        Reset();
+                    }
+                    else if (result == 2) {
+                        toastr.warning('Notice is already present.');
+                        GetNoticeList();
+                        Reset();
+                    }
+                    else if (result == 3) {
+                        toastr.success('Notice Updated Successfully.');
+                        GetNoticeList();
+                        Reset();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        GetNoticeList();
+                        Reset();
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+
+    }
+
+    function GetNoticeList() {
+
+
+        let searchbyname = $("#txtsearch").val();
+        let pagenumber = parseInt($("#hdfPageNumber").val());
+        let pagesize = parseInt($("#hdfPageSize").val());
+        var param = {
+            "SearchByName": searchbyname,
+            "PageNumber": pagenumber,
+            "PageSize": pagesize
+
+        };
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Notice/NoticeList",
+            data: { param: JSON.stringify(param) },
+            success: function (data) {
+
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+                if (pagenumber == 1) {
+                    $("#Paginate").pagination({
+
+                        items: parseInt(obj.CustomPagination),
+                        itemsOnPage: parseInt($('#hdfPageSize').val()),
+                        cssStyle: "light-theme",
+                        onPageClick: function (pagenumber, event) {
+                            $("#hdfPageNumber").val(pagenumber);
+                            window.scrollTo(0, 0);
+                            GetNoticeList();
+                        }
+                    });
+                }
+
+                var str = '';
+                let sno = 1;
+                for (var item in obj.LstNotice) {
+
+                    str += "<tr>";
+                    str += "<td>" + sno + "</td>";
+                    let notice = obj.LstNotice[item].Notice;
+                    let noticestring = notice.slice(0, 10) + '.....';
+                    str += "<td>" + dateformat(obj.LstNotice[item].Crdt) + "</td>";
+                    str += "<td><a herf='#' data-toggle='modal' data-target='#ShowNoticeModal' onclick='ViewNoticeName(\"" + obj.LstNotice[item].Notice + "\")' >" + noticestring + " </a></td>";
+
+
+                    let customer = obj.LstNotice[item].Customer;
+                    if (customer == true) {
+                        str += '<td > <label class="switch"><input type="checkbox" checked onchange = "UpdateViewNoticeCustomer(' + obj.LstNotice[item].NoticeId + ')" id="chkcust' + obj.LstNotice[item].NoticeId + '" /><span class="slider round"></span> </label ></td>';
+                    }
+                    else {
+                        str += '<td > <label class="switch"><input type="checkbox" onchange = "UpdateViewNoticeCustomer(' + obj.LstNotice[item].NoticeId + ')" id="chkcust' + obj.LstNotice[item].NoticeId + '" /><span class="slider round"></span> </label ></td>';
+                    }
+                   
+                    let employee = obj.LstNotice[item].Employee;
+                    if (employee == true) {
+
+                        str += '<td > <label class="switch"><input type="checkbox" checked onchange = "UpdateViewNoticeEmployee(' + obj.LstNotice[item].NoticeId + ')" id="chkemp' + obj.LstNotice[item].NoticeId + '" /><span class="slider round"></span> </label ></td>';
+                    }
+                    else {
+                        str += '<td > <label class="switch"><input type="checkbox" onchange = "UpdateViewNoticeEmployee(' + obj.LstNotice[item].NoticeId + ')" id="chkemp' + obj.LstNotice[item].NoticeId + '" /><span class="slider round"></span> </label ></td>';
+                    }
+                   
+                    let trainer = obj.LstNotice[item].Trainer;
+                    if (trainer == true) {
+                        str += '<td > <label class="switch"><input type="checkbox" checked  onchange = "UpdateViewNoticeTrainer(' + obj.LstNotice[item].NoticeId + ')" id="chktrainer' + obj.LstNotice[item].NoticeId + '" /><span class="slider round"></span> </label ></td>';
+                    }
+                    else {
+                        str += '<td > <label class="switch"><input type="checkbox" onchange = "UpdateViewNoticeTrainer(' + obj.LstNotice[item].NoticeId + ')" id="chktrainer' + obj.LstNotice[item].NoticeId + '" /><span class="slider round"></span> </label ></td>';
+                    }
+                    str += "<td><a href='#' title='Edit' data-toggle='modal' data-target='#NoticeModal' onclick='EditNotice(\"" + obj.LstNotice[item].NoticeId + "\")'><span class='fa fa-edit' style='color: blue;'></span></a> | <a href='#' title='Delete' data-toggle='tooltip' onclick='DeleteNotice(\"" + obj.LstNotice[item].NoticeId + "\")'><span class='fa fa-trash' style='color: red;'></span></a> </td>";
+                    str += "</tr>";
+
+                    sno++;
+
+
+                }
+                if (str != "") {
+                    $("#tblcontent").html(str);
+                }
+                else {
+                    $("#tblcontent").html("no record found");
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+    }
+
+    const Search = () => {
+        $("#hdfPageNumber").val(1);
+        GetNoticeList();
+    }
+
+    function Reset() {
+        
+        $("#ShowNoticeModal").modal('hide');
+        $("#SendNoticeModal").modal('hide');
+        $("#NoticeModal").modal('hide');  
+        tinyMCE.activeEditor.setContent("");
+       
+        $('.chkform').prop("checked", false);
+
+        $("#hdfNoticeId").val("");
+        $("#txtsearch").val("");
+        $("#btnsave").html("Save");
+        GetNoticeList();
+
+    }
+
+    const EditNotice = (Id) => {
+
+        $("#hdfNoticeId").val(Id);
+        $("#btnsave").html("Update");
+        $("body").addClass("loading");
+
+        $.ajax({
+            cache: false,
+            type: "Get",
+            dataType: "json",
+            url: "/Admin/Notice/GetNoticeDetailsById",
+            data: { "Id": Id },
+            success: function (data) {
+                let data1 = JSON.stringify(data);
+                let obj = JSON.parse(data1);
+               
+                
+                if (obj != "undefined") {
+                  
+                    tinyMCE.activeEditor.setContent(obj.Notice);
+                    
+                    let customer = obj.Customer;
+                    if (customer == true) {
+                        $('#chkcustreg').prop("checked", true);
+                    }
+                    else {
+                        $('#chkcustreg').prop("checked", false);
+                    }
+                    let employee = obj.Employee;
+                    if (employee == true) {
+                        $('#chkempreg').prop("checked", true);
+                    }
+                    else {
+                        $('#chkempreg').prop("checked", false);
+                    }
+                    let trainer = obj.Trainer;
+                    if (trainer == true) {
+                        $('#chktrainerreg').prop("checked", true);
+                    }
+                    else {
+                        $('#chktrainerreg').prop("checked", false);
+                    }
+                 
+
+
+                }
+                $("body").removeClass("loading");
+            },
+            error: function (errormessage) {
+                $("body").removeClass("loading");
+            }
+        });
+
+    }
+
+    const DeleteNotice = (NoticeId) => {
+        let result = confirm("Are You Sure, You want to delete the Notice ?");
+
+        if (result == false) {
+            return false;
+        }
+        else {
+            $("body").addClass("loading");
+
+            let param =
+            {
+                "NoticeId": NoticeId
+            };
+
+            $.ajax({
+                cache: false,
+                type: "Get",
+                dataType: "json",
+                url: "/Admin/Notice/DeleteNotice",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+
+                    if (result == 4) {
+                        toastr.success('Notice Deleted Successfully.');
+                        GetNoticeList();
+                        Reset();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        Reset();
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+    }
+
+    const dateformat = (date) => {
+        let newdate = new Date(date),
+            month = '' + (newdate.getMonth() + 1),
+            day = '' + newdate.getDate(),
+            year = newdate.getFullYear();
+
+        if (month.length < 2) {
+            month = '0' + month;
+        }
+
+        if (day.length < 2) {
+            month = '0' + day;
+        }
+
+        return [month, day, year].join('/');
+    }
+
+    function UpdateViewNoticeEmployee(NoticeId) {
+
+        let alrtmsg = "";        
+        let employee;
+        if ($('#chkemp'+NoticeId).is(':checked')) {
+            employee = 1;;
+        }
+        else {
+            employee = 0;
+        }
+        let currentuserid = $("#hdfcurrentuserid").val();
+        if (alrtmsg != "") {
+            toastr.warning(alrtmsg);
+        }
+        else {
+
+            var param = {
+                "Employee": employee,               
+                "CrdtBy": currentuserid,
+                "NoticeId": NoticeId
+            };
+            $("body").addClass("loading");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Notice/UpdateViewNoticeEmployee",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+                    if (result == 5) {
+                        toastr.success('Notice send Successfully.');
+                        Reset();
+                        GetNoticeList();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        Reset();
+                        GetNoticeList();
+
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+
+    }
+    function UpdateViewNoticeCustomer(NoticeId) {
+
+        let alrtmsg = "";  
+        let customer; 
+        if ($('#chkcust' + NoticeId).is(':checked')) {
+            customer = 1;
+        }
+        else {
+            customer = 0;
+        }
+
+
+        let currentuserid = $("#hdfcurrentuserid").val();
+        if (alrtmsg != "") {
+            toastr.warning(alrtmsg);
+        }
+        else {
+
+            var param = {
+                "Customer": customer,
+                "CrdtBy": currentuserid,
+                "NoticeId": NoticeId
+
+            };
+            $("body").addClass("loading");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Notice/UpdateViewNoticeCustomer",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+                    if (result == 5) {
+                        toastr.success('Notice send Successfully.');
+                        Reset();
+                        GetNoticeList();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        Reset();
+                        GetNoticeList();
+
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+
+    }
+    function UpdateViewNoticeTrainer(NoticeId) {
+
+        let alrtmsg = "";
+        debugger;
+        let trainer;
+        if ($('#chktrainer' + NoticeId).is(':checked')) {
+            trainer = 1;
+        }
+        else {
+            trainer = 0;
+        }
+        let currentuserid = $("#hdfcurrentuserid").val();
+        if (alrtmsg != "") {
+            toastr.warning(alrtmsg);
+        }
+        else {
+
+            var param = {
+                "Trainer": trainer,
+                "CrdtBy": currentuserid,
+                "NoticeId": NoticeId
+
+            };
+            $("body").addClass("loading");
+            $.ajax({
+                cache: false,
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Notice/UpdateViewNoticeTrainer",
+                data: { param: JSON.stringify(param) },
+                success: function (result) {
+                    if (result == 5) {
+                        toastr.success('Notice send Successfully.');
+                        Reset();
+                        GetNoticeList();
+                    }
+
+                    else {
+                        toastr.error('Something Went Wrong.');
+                        Reset();
+                        GetNoticeList();
+
+                    }
+                    $("body").removeClass("loading");
+                },
+                error: function (errormessage) {
+                    $("body").removeClass("loading");
+                }
+            });
+        }
+
+    }
+
+    function ViewNoticeName(noticename) {
+        debugger;
+        
+        $("#txtshownoticename").text(noticename);
+       
+
+    }
+
+
+
+</script>
+
